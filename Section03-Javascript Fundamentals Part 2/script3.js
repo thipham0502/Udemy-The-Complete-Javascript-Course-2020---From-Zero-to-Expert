@@ -154,3 +154,10 @@ console.log(types);
 
 /* Lec48. Looping Backwards and Loops in Loops */
 /* Lec49. 'While' loop */
+let i = 10;
+while (i > 0) {
+	let dice = Math.random() * 6; //random(): randoming 10 values between 0,1
+	console.log(`Throw ${i} times: value = ${dice}
+    dice = ${Math.trunc(dice) + 1}`);
+	i--;
+}
