@@ -1,14 +1,14 @@
 /* Lec13. let, const, var */
-/* let, const: ES6 (modern Js), var: old way of defining variables*/
+/* let, const: ES6 (modern Js), var: old way of defining variables */
 /* let: block-scoped, var: function-scoped */
-//let: used to declare variables that will be changed later, or declare empty values
+// let: used to declare variables that will be changed later, or declare empty values
 let age = 22;
 age = 23;
 
 let firstName;
 firstName = 'John';
 
-//const: used to declare variables that will NOT be changed later
+// const: used to declare variables that will NOT be changed later
 const birthYear = 1998;
 //birthYear = 2002; // get TypeError!!!
 
@@ -43,7 +43,7 @@ line
 string with backtick!`);
 
 /* Lec18. If/else */
-// Adding emoji ^^: Window and '.'
+// Adding emoji: Window + '.'
 console.log(`Some icon: 🎶💕✨`);
 
 /* Lec20. Type conversion and Coercion */
@@ -136,3 +136,28 @@ else if (isMale && !isAdult) console.log('Boy');
 else if (!isMale && isAdult) console.log('Woman');
 else if (!isMale && !isAdult) console.log('Girl');
 else console.log('Characteristic undefined!');
+
+/* Lec26. Switch statement */
+const day = 3;
+switch (day) {
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+		console.log('Weekday');
+		break;
+	case 7:
+	case 8:
+		console.log('Weekend');
+		break;
+	default:
+		console.log('Not valid!');
+	//break;
+}
+
+/* Lec28. Conditional (Ternary) Operator */
+const myAge = 18;
+let adult = myAge >= 18 ? true : false;
+console.log(adult);
+console.log(`You are ${myAge >= 18 ? 'an' : 'not an'} adult.`);
