@@ -146,7 +146,11 @@ const arr2 = [ 1, '2', [ 3, 4, 5 ], true ];
 const types = [];
 for (let i = 0; i < arr2.length; i++) {
 	if (typeof arr2[i] !== 'string') continue;
+	else if (typeof arr2[i] === 'number') break;
 	console.log(arr2[i], typeof arr2[i]);
 	types.push(typeof arr2[i]);
 }
 console.log(types);
+
+/* Lec48. Looping Backwards and Loops in Loops */
+/* Lec49. 'While' loop */
