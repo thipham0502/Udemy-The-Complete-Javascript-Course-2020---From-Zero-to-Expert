@@ -73,9 +73,10 @@ years[3] = calcAge1(years[3]);
 console.log(years); // [1964, "abc", [1, 2, 3], 18]
 
 /* Lec40. Basic Array Operations (Methods) */
-// push: add new element to the END of the array & return length of the new array
+// push: add 1 or more new elements to the END of the array & return length of the new array
 const arr1 = [ 'a', 'b', 'c', 'd' ];
 const newLength = arr1.push('e'); //5
+// arr1.push('f', 'g', 'h');
 console.log(`newLength = ${newLength}`);
 console.log(arr1); //["a", "b", "c", "d", "e"]
 

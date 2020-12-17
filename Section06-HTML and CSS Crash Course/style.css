@@ -1,0 +1,58 @@
+* {
+	/*all elements*/
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+body {
+	background-color: rgb(252, 242, 158);
+	font-family: 'Segoe UI';
+	font-size: 20px;
+	padding: 50px;
+}
+
+h1 {
+	font-size: 40px;
+	margin-bottom: 25px;
+	text-align: center;
+}
+
+h2 {
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.first {
+	color: rgb(6, 77, 9);
+}
+
+#your-name {
+	background-color: rgb(105, 255, 243);
+	border: 5px solid #302c2b;
+	width: 400px;
+	padding: 25px;
+	margin-top: 30px;
+}
+
+p {
+	margin-bottom: 20px;
+}
+
+input,
+button {
+	padding: 10px;
+	font-size: 16px;
+}
+
+a {
+	background-color: tomato;
+}
+
+#your-name h2 {
+	color: slateblue;
+}
+
+img#course-image {
+	width: 300px;
+	/* height: 300px; */
+}

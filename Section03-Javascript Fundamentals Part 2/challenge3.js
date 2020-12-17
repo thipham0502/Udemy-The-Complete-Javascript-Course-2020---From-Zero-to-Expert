@@ -133,11 +133,19 @@ length of the array (because that's the number of elements)
 const bills1 = [ 22, 295, 176, 440, 37, 105, 10, 1100, 86, 52 ];
 const tips1 = [],
 	totals1 = [];
-for (let i = 0; i < bills.length; i++) {
-	const tip = calcTip(bills[i]);
-	tips.push(tip);
-	totals.push(bills[i] + tip);
+for (let i = 0; i < bills1.length; i++) {
+	const tip = calcTip(bills1[i]);
+	tips1.push(tip);
+	totals1.push(bills1[i] + tip);
 }
-console.log(`Bills: ${bills}`);
-console.log(`Tips: ${tips}`);
-console.log(`Totals: ${totals}`);
+console.log(`Bills: ${bills1}`);
+console.log(`Tips: ${tips1}`);
+console.log(`Totals: ${totals1}`);
+
+const calcAverage = function(arr) {
+	let sum = 0;
+	for (let i = 0; i < arr.length; i++) sum += arr[i];
+	return sum / arr.length;
+};
+console.log(`Average of totals = ${calcAverage(totals1)}`);
+console.log(`Average of tips = ${calcAverage(tips1)}`);
