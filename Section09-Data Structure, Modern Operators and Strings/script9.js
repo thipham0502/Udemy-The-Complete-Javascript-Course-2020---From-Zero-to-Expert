@@ -170,15 +170,14 @@ console.log(4, 5, 6, 7); //4 5 6 7
 const newMenu = [ ...restaurant.mainMenu, 'Gnocci' ]; //add new dish 'Gnocci' to the main menu
 console.log('newMenu:', newMenu);
 
-/*const buyFruits = function(fruit1, fruit2, fruit3) {
+// Parsing arguments into function using (...) operator
+const buyFruits = function(fruit1, fruit2, fruit3) {
 	console.log(`You have bought: ${fruit1}, ${fruit2}, ${fruit3}`);
 };
-const fruits = [ prompt('Fruit #1:'), prompt('Fruit #2:'), prompt('Fruit #3:') ];
-console.log(fruits);
-
-//buyFruits(fruits[0], fruits[1], fruits[2]);
+//const fruits = [ prompt('Fruit #1:'), prompt('Fruit #2:'), prompt('Fruit #3:') ];
+const fruits = [ 'Banana', 'Grape', 'Cherry' ];
+//buyFruits(fruits[0], fruits[1], fruits[2]); //old style
 buyFruits(...fruits); //parsing arguments into function using (...) operator
-*/
 
 // Duplicate array
 const newMenu_Copy = [ ...newMenu ];
@@ -221,3 +220,195 @@ console.log(p, q, others); //packing [3, 4, 5] to an array 'others'
 const [ pizza, risotto, ...otherFood ] = [ ...restaurant.mainMenu, ...restaurant.starterMenu ];
 console.log(...restaurant.mainMenu, ...restaurant.starterMenu); //Pizza Pasta Risotto Focaccia Bruschetta Garlic Bread Caprese Salad
 console.log(otherFood); //Risotto Focaccia Bruschetta Garlic Bread Caprese Salad
+
+restaurant = {
+	openingHours: {
+		thu: {
+			open: 12,
+			close: 22
+		},
+		fri: {
+			open: 11,
+			close: 23
+		},
+		sat: {
+			open: 0, // Open 24 hours
+			close: 24
+		}
+	}
+};
+// Destructuring objects using Rest (...) operator
+//// Take out opening hours of Saturday, and the rest are weekdays
+const { sat, ...weekdays } = restaurant.openingHours;
+console.log(sat, weekdays);
+
+// Packing all of the function's arguments into an array (while the Spread (...) operator is used to parse arguments to the function)
+const add = function(...numbers) {
+	//Rest (...) operator: packing arguments to an array 'numbers'
+	let sum = 0;
+	for (let i = 0; i < numbers.length; i++) sum += numbers[i];
+	console.log(numbers);
+	console.log('Sum =', sum);
+};
+//// Using (...), we can parse any number of arguments to the function
+add(2, 3); //[2, 3] - 2 arguments
+add(5, 4, 7, 2); //[5, 4, 7, 2] - 4 arguments
+add(8, 4, 1, 4, 2, 7, 9); //[8, 4, 1, 4, 2, 7, 9] - 7 arguments
+const args = [ 1, 2, 3 ];
+add(...args); //Spread (...) operator: unpacking the 'args' list to become the function's arguments
+
+restaurant = {
+	name: 'Classico Italiano',
+	location: 'Via Angelo Tavanti 23, Firenze, Italy',
+	categories: [ 'Italian', 'Pizzeria', 'Vegetarian', 'Organic' ],
+	starterMenu: [ 'Focaccia', 'Bruschetta', 'Garlic Bread', 'Caprese Salad' ],
+	mainMenu: [ 'Pizza', 'Pasta', 'Risotto' ],
+
+	openingHours: {
+		thu: {
+			open: 12,
+			close: 22
+		},
+		fri: {
+			open: 11,
+			close: 23
+		},
+		sat: {
+			open: 0, // Open 24 hours
+			close: 24
+		}
+	},
+
+	//return the starter and main dish according to their index
+	order: function(starterIndex, mainIndex) {
+		return [ this.starterMenu[starterIndex], this.mainMenu[mainIndex] ];
+	},
+
+	//destructuring object when parsing to function, with default values
+	orderDelivery: function({ starterIndex = 0, mainIndex = 0, time = '08:03', address }) {
+		console.log(
+			`Order received! ${this.starterMenu[starterIndex]} and ${this.mainMenu[
+				mainIndex
+			]} will be delivered to ${address} at ${time}`
+		);
+	},
+
+	orderPizza: function(mainIngredient, ...otherIngredients) {
+		console.log(`Main ingredient: ${mainIngredient}`);
+		console.log('Other ingredients:', otherIngredients);
+	}
+};
+restaurant.orderPizza('mushrooms', 'onion', 'olives', 'spinach'); //Main ingredient: 'mushrooms', others: ['onion', 'olives', 'spinach']
+restaurant.orderPizza('mushrooms'); //Main ingredient: 'mushrooms', others: []
+
+/* Lec107. Short Circuiting (&& and ||) */
+// &&, || can:
+//// Use any data types
+//// Return any data types
+
+console.log('-------- OR --------');
+//// 'OR' Short-circuiting: return the 1st truthy value (because 1 truthy value -> the whole condition will be true), if they are all falsy values, then return the last one
+console.log(3 || 'Kathy'); //3 (3 is the 1st truthy value)
+console.log(undefined || 'Kathy'); //'Kathy' (undefined is a falsy value)
+console.log(0 || true); //true (0 is a falsy value)
+console.log(null || undefined); //undefined (all are falsy value => return the last one)
+console.log('' || 0); //0 (all are falsy value => return the last one)
+console.log(undefined || '' || 0 || 'Hello' || 10 || null || 'Kathy'); //'Hello' (the 1st truthy value)
+
+//// Practical example with 'OR' Short-circuiting: define default values
+const guests1 = restaurant.numGuests ? restaurant.numGuests : 10; //10: the number of guests will be default 10 if 'numGuests' is undefined
+console.log(guests1);
+
+restaurant.numGuests = 30;
+const guests2 = restaurant.numGuests || 10; //30
+console.log(guests2);
+
+// NOTE:
+restaurant.numGuests = 0;
+const guests3 = restaurant.numGuests || 10; //10: 0 is falsy value -> be careful!! (see Lec108. for better solution)
+console.log(guests3);
+
+console.log('-------- AND --------');
+//// 'AND' Short-circuiting: return the 1st falsy value (because 1 falsy value -> the whole condition will be false), if they are all truthy values, then return the last one
+console.log(undefined && 'Kathy'); //undefined (undefined is a falsy value)
+console.log(true && 0); //0 (0 is a falsy value)
+console.log('' && undefined && null); //'' ('' is the 1st falsy value)
+console.log('Kathy' && 22); //22 (all are truthy values => return the last one)
+console.log('Hello' && 100 && undefined && '' && 0 && 30 && null); //undefined (the 1st falsy value)
+
+//// Practical example with 'AND' Short-circuiting: check if an object/function/variable/etc exists and execute sth if it exists
+////// Check if a function property exists, if exists, then call it
+if (restaurant.orderPizza) {
+	// Method #1: using 'if'
+	restaurant.orderPizza('mushrooms', 'spinach');
+}
+restaurant.orderPizza && restaurant.orderPizza('mushrooms', 'spinach'); // Method #2: using &&
+
+/* Lec108. The Nullish Coalescing Operator '??' (ES2020) */
+// Nullish (falsy) values: null & undefined (0 and '' are truthy)
+// restaurant.numGuests = 0;
+// const guests4 = restaurant.numGuests ?? 10; //0: works the same as '||', but considers 0 a truthy value
+// console.log(guests4);
+// console.log(0 ?? undefined); //0
+// console.log(null ?? ''); //''
+// console.log(null ?? 0); //0
+
+/* Lec110. Looping Arrays: The for-of Loop */
+menu = [ ...restaurant.starterMenu, ...restaurant.mainMenu ];
+console.log(menu);
+// Iterate through all array's elements
+for (const item of menu) {
+	console.log(item);
+}
+
+// Get element's index and value using .entries()
+console.log('Your menu contains:\n');
+//// Method 1:
+// for (const item of menu.entries()) {
+// 	//console.log(item); //[0, "Focaccia"], ...
+// 	console.log(`${item[0] + 1}: ${item[1]}`);
+// }
+//// Method 2:
+for (const [ index, element ] of menu.entries()) {
+	//console.log(item); //[0, "Focaccia"], ...
+	console.log(`${index + 1}: ${element}`);
+}
+console.log(menu.entries()); //Iterator
+console.log([ ...menu.entries() ]); //Array: [[0, "Focaccia"], [1, "Bruschetta"], [2, "Garlic Bread"], ...]
+
+/* Lec111. Enhanced Object Literals (ES6) */
+const homeTown = {
+	street: 'NDC',
+	district: 'TP',
+	city: 'HCMC'
+};
+const interests = [ 'Color', 'Movie', 'Song' ];
+const kathy = {
+	lastName: 'Pham',
+	birthYear: 1998,
+	school: 'HCMUS',
+	graduatationYear: 2020,
+
+	// 1. Add an object to an object with the same name:
+	//homeTown: homeTown //old way
+	homeTown, //ES6 enhanced object literals
+
+	// 2. Create a function inside an object
+	// calcAge: function() {
+	// 	console.log(`Your age is: ${2020 - this.birthYear}`);
+	// } //old way
+
+	calcAge() {
+		console.log(`Your age is: ${2020 - this.birthYear}`);
+	}, //ES6 enhanced object literals
+
+	// 3. Compute name of properties
+	['favorite' + interests[0]]: 'Red', //favoriteColor
+	['favorite' + interests[1]]: 'Titanic', //favoriteMovie
+	['favorite' + interests[2]]: 'Dynamite', //favoriteSong
+	[`workPlaceYear${2020 + 1}`]: 'Laidon'
+};
+console.log(kathy);
+kathy.calcAge();
+
+/* Lec112. Optional Chaining '.?' */
