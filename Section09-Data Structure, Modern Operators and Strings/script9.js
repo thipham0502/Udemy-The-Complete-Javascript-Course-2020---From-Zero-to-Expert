@@ -344,7 +344,7 @@ if (restaurant.orderPizza) {
 }
 restaurant.orderPizza && restaurant.orderPizza('mushrooms', 'spinach'); // Method #2: using &&
 
-/* Lec108. The Nullish Coalescing Operator '??' (ES2020) */
+/* Lec108. The Nullish Coalescing Operator '??' (ES2020, but I still get error Unexpected token) */
 // Nullish (falsy) values: null & undefined (0 and '' are truthy)
 // restaurant.numGuests = 0;
 // const guests4 = restaurant.numGuests ?? 10; //0: works the same as '||', but considers 0 a truthy value
@@ -411,4 +411,48 @@ const kathy = {
 console.log(kathy);
 kathy.calcAge();
 
-/* Lec112. Optional Chaining '.?' */
+/* Lec112. Optional Chaining '.?' (ES2020, but I still get error "You can only use optional-chaining when the 'optionalChaining' plugin is enabled") */
+// NOTE: Install npm: npm install
+// Install ES2020: npm install ES2020
+
+restaurant = {
+	openingHours: {
+		thu: {
+			open: 12,
+			close: 22
+		},
+		fri: {
+			open: 11,
+			close: 23
+		},
+		sat: {
+			open: 0, // Open 24 hours
+			close: 24
+		}
+	}
+};
+// Ex: Suppose we want to print the open hour of the restaurant on Saturday
+// -> must exist 'openingHours' property, 'fri' property, and 'open' property
+// Checking existence (if clause):
+if (restaurant.openingHours && restaurant.openingHours.fri && restaurant.openingHours.fri.open) {
+	console.log(restaurant.openingHours.fri.open);
+}
+// -> This is convenient if there are too many properties to check
+// -> Use Optional Chaining
+// console.log(restaurant.openingHours.fri?.open); //check if 'mon' property exists, then print 'open'. else, print undefined => result: 11
+
+// console.log(restaurant.openingHours.mon?.open); //check if 'mon' property exists, then print 'open'. else, print undefined => result: undefined
+
+// console.log(restaurant.openHours?.mon?.open); //check if 'openHours' property exists, then check if 'mon' property exists, then print 'open'. else, print undefined => result: undefined
+
+const days = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ];
+// Check if the restaurant is open on these days
+
+//// for-of looping array
+// for (let day of days) {
+// 	console.log(day)
+// 	const open = restaurant.openingHours[day]?.open ?? null; // use Nullish ?? operator (because open can be 0)
+// 	if(open) console.log('The restaurant opens at: ${open} on: ${day}')
+//  else console.log('The restaurant closes on: ${day}')
+// }
+console.log(null ?? 0);
