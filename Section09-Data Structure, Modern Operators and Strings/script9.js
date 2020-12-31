@@ -64,6 +64,7 @@ console.log(x, y, z); //0, 9, undefined
 console.log(x, y, z); //8, 9, 1
 
 /* Lec103. Destructuring objects */
+// NOTE: Objects are not iterable (must use Object.entries() to convert to array to do looping)
 restaurant = {
 	name: 'Classico Italiano',
 	location: 'Via Angelo Tavanti 23, Firenze, Italy',
@@ -429,6 +430,10 @@ restaurant = {
 			open: 0, // Open 24 hours
 			close: 24
 		}
+	},
+	//return the starter and main dish according to their index
+	order: function(starterIndex, mainIndex) {
+		return [ this.starterMenu[starterIndex], this.mainMenu[mainIndex] ];
 	}
 };
 // Ex: Suppose we want to print the open hour of the restaurant on Saturday
@@ -448,11 +453,376 @@ if (restaurant.openingHours && restaurant.openingHours.fri && restaurant.opening
 const days = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ];
 // Check if the restaurant is open on these days
 
-//// for-of looping array
-// for (let day of days) {
+// Use optional chaining for arrays
+// for (let day of days) { (//// for-of looping array)
 // 	console.log(day)
+// // Check if openingHours[day] exists. If so, get the 'open' property
 // 	const open = restaurant.openingHours[day]?.open ?? null; // use Nullish ?? operator (because open can be 0)
 // 	if(open) console.log('The restaurant opens at: ${open} on: ${day}')
 //  else console.log('The restaurant closes on: ${day}')
 // }
-console.log(null ?? 0);
+
+// Use optional chaining for methods
+// console.log(restaurant.order?.(0,1) ?? 'Method does not exist.'); //Call function 'order' because it exists
+// console.log(restaurant.order?.(0,1) ?? 'Method does not exist.'); //Print 'Method does not exist.' because function 'orderSomething' does not exist
+
+// // Use optional chaining for methods
+// console.log(restaurant.order?.(0,1) ?? 'Method does not exist.'); //Call function 'order' because it exists
+
+/* Lec113. Looping objects: Object Keys, Values, and Entries */
+console.log('\n----------Lec113. Looping objects: Object Keys, Values, and Entries----------');
+
+// Property NAMES: Object.keys()
+const properties = Object.keys(openingHours);
+console.log(properties);
+
+let openStr = `We are open on ${properties.length} days: `;
+for (const day of properties) {
+	openStr += `${day}, `;
+}
+console.log(openStr);
+
+// Property VALUES: Object.values()
+const values = Object.values(openingHours);
+console.log(values);
+
+for (const hour of values) {
+	console.log(hour); //{open: 12, close: 22}
+}
+
+// ENTIRE object: Object.entries() -> Return an array
+const entries = Object.entries(openingHours);
+console.log(entries);
+// [
+// 	[
+// 		thu: {
+// 			open: 12,
+// 			close: 22
+// 		}
+// 	], ...
+// ];
+for (const [ key, { open, close } ] of entries) {
+	console.log(`On ${key} we open at ${open} o'clock and close at ${close} o'clock`);
+}
+
+/* Lec114. Sets */
+console.log('\n----------Lec114. Sets----------');
+// Collections of unique values (can hold multiple data types)
+const ordersSet = new Set([ 'Pasta', 'Pizza', 'Risotto', 'Pasta', 'Pizza' ]);
+console.log(ordersSet); //{"Pasta", "Pizza", "Risotto"} => removed duplicated values
+
+// Create a set from a string -> Unique characters in the string
+console.log(new Set('a string')); // {"a", " ", "s", "t", "r", "i", "n", "g"}
+
+// Number of elements in the set
+console.log(ordersSet.size);
+
+// Check if an element exists in the set
+console.log(ordersSet.has('Pizza')); //true
+console.log(ordersSet.has('Pie')); //false
+
+// Add new element to the set
+ordersSet.add('Bread');
+ordersSet.add('Bread');
+console.log(ordersSet); //{"Pasta", "Pizza", "Risotto", "Bread"} => removed duplicated values
+
+// Delete an element in the set
+ordersSet.delete('Pizza');
+console.log(ordersSet); //{"Pasta", "Risotto", "Bread"}
+
+// Delete all element in the set
+//ordersSet.clear();
+//console.log(ordersSet); //{}
+
+// Take out an element is not supported in set (can't use ordersSet[0])
+
+// Looping
+let i = 1;
+for (const order of ordersSet) {
+	console.log(`${i++} ${order}`);
+}
+
+// Array -> Set ; Set -> Array
+const staff = [ 'Waiter', 'Chef', 'Waiter', 'Manager', 'Chef', 'Manager' ];
+const staffUnique = new Set(staff); //Array -> Set
+console.log(staffUnique);
+
+const staffArray = [ ...staffUnique ]; //Set -> Array (using Spread (...) operator)
+console.log(staffArray);
+
+// Fun: How many unique charaters in my name
+console.log(new Set('PhamQuynhThi').size); //10
+
+/* Lec116. Maps: Fundamentals */
+// Map: Data structure used to map values to keys (like objects, but the keys can have any type)
+// Objects: keys are strings
+// Maps: keys can be any type (can be objects, arrays, maps, ...)
+
+//// Initialize the map
+const restaurantMap = new Map();
+
+//// Fill the map with elements
+restaurantMap.set('name', 'Classico Italiano'); //key with string type
+restaurantMap.set(1, '1st Location'); //key with number type
+restaurantMap.set([ 'John', 'Mary' ], 'Owner'); //key with array type
+
+console.log(restaurantMap.set(2, '2nd Location')); //.set() return new Map with new element: {"name" => "Classico Italiano", 1 => "1st Location", 2 => "2nd Location"}
+
+restaurantMap
+	.set('Categories', [ 'Italian', 'Pizzeria', 'Vegetarian', 'Organic' ])
+	.set('open', 10)
+	.set('close', 23)
+	.set(true, 'We are open :)')
+	.set(false, 'We are closed :(');
+console.log(restaurantMap);
+
+// Take out an element in the map: use .get() and parse in the key name
+console.log(restaurantMap.get('name')); //'Classico Italiano'
+console.log(restaurantMap.get(1)); //1st Location
+console.log(restaurantMap.get(false)); //'We are closed :('
+
+// Check if the restaurant is still open (if time between open and close -> true. else -> false)
+const time = 21;
+console.log(restaurantMap.get(time > restaurantMap.get('open') && time < restaurantMap.get('close'))); //We are closed :(
+
+// Check if a map contains a certain key
+console.log(restaurantMap.has('Categories')); //true
+console.log(restaurantMap.has('Address')); //false
+
+// Number of elements in the map
+console.log(restaurantMap.size);
+
+// Delete an element in a map by key
+restaurantMap.delete(2);
+console.log(restaurantMap);
+
+// Delete all element in the set
+//restaurantMap.clear();
+//console.log(restaurantMap); //{}
+
+// Take out element which key is an array
+console.log(restaurantMap.set([ 1, 2 ], 'test'));
+console.log(restaurantMap.get([ 1, 2 ])); //undefined. This [1, 2] and the [1, 2] in the map is 2 different things, with different address in the heap
+
+//// Solution: Store the key in a variable
+const arrKey = [ 'abc', true, 123 ];
+console.log(restaurantMap.set(arrKey, 'test'));
+console.log(restaurantMap.get(arrKey));
+
+restaurantMap.set(document.querySelector('h1'), 'Heading');
+console.log(restaurantMap);
+
+/* Lec117. Maps: Iteration */
+// Creating new map with multiple elements
+const questionMap = new Map([
+	[ 'question', 'What is the best programming language in the world?' ],
+	[ 1, 'C' ],
+	[ 2, 'Java' ],
+	[ 3, 'Javascript' ],
+	[ 4, 'Python' ],
+	[ 'correct', 3 ],
+	[ true, 'Correct 🎉' ],
+	[ false, 'Try again 😕' ]
+]); //the structure is similar to Object.entries()
+console.log(questionMap);
+console.log(Object.entries(openingHours));
+
+// Convert Object -> Map
+const openingHoursMap = new Map(Object.entries(openingHours));
+console.log(openingHoursMap);
+
+// Looping (Maps are iterable, so we can loop through element using for-of)
+console.log(questionMap.get('question'));
+for (const [ key, value ] of questionMap) {
+	if (typeof key === 'number') console.log(`Answer ${key}: ${value}`);
+}
+const answer = 3; //Number(prompt('Your answer: '));
+console.log(answer);
+
+console.log(questionMap.get(answer === questionMap.get('correct')));
+//window.alert(questionMap.get(answer === questionMap.get('correct')));
+
+// Convert Map -> Array
+console.log([ ...openingHoursMap ]);
+
+// Map's methods: return a MapIterator -> have to convert to array
+console.log(questionMap.entries());
+console.log([ ...questionMap.entries() ]); //convert to array
+
+console.log(questionMap.keys());
+console.log([ ...questionMap.keys() ]); //convert to array
+
+console.log(questionMap.values());
+console.log([ ...questionMap.values() ]); //convert to array
+
+/* Lec118. Summary: Which data structure to use? */
+// Sources of data:
+//// 1. Source code
+//// 2. DOM elements
+//// 3. Web API (Application Programming Interface): JSON ~ Javscript's Objects and Arrays
+
+// Javascript's built-in data structure: When to use which?
+//// Simple list: Arrays or Sets
+////// Arrays vs. Sets:
+let arrTasks = [ 'Code', 'Eat', 'Code' ],
+	setTasks = new Set([ 'Code', 'Eat', 'Sleep' ]);
+//////// Arrays: use when you need ORDERED list of values, can contain duplicates, and when you need to manipulate data (because there are many useful array methods)
+//////// Sets: use when you need UNIQUE values, high-performance (search and delete items in sets can be up to 10 times faster than in arrays), and remove duplicates from arrays
+
+//// Key/Value pairs: Objects or Maps (keys describe values)
+let objTasks = { task: 'Code', date: 'today', repeat: true },
+	mapTasks = new Map([ [ ('task', 'Code') ], [ 'date', 'today' ], [ false, 'Start coding!' ] ]);
+//////// Objects: more traditional key/value store, easier to write and access values with "." and "[]", can use 'this' keyword. Use when you need to include functions (methods), when working with JSON (can convert to map)
+
+//////// Maps: better performance, keys can have any data type, easy to iterate, easy to compute size. Use when you simply need to map key to values, when you need keys that are not strings
+
+// Advanced Data structures:
+//// Built-in: WeakMap, WeakSet
+//// Non Built-in: Stacks, Queues, Linked lists, trees, hash tables
+
+/* Lec120. Working with Strings - Part 1 */
+const airline = 'TAP Air Portugal';
+const plane = 'A320';
+console.log(plane[0]);
+console.log(plane[1]);
+console.log('A320'[0]);
+
+// Find length of a string
+console.log(plane.length);
+
+// Find the 1st index of a character in a string
+console.log(airline.indexOf('A')); //0
+console.log(airline.indexOf('B')); //-1
+
+// Find the last index of a character in a string
+console.log(airline.lastIndexOf('A')); //4
+
+// Find the 1st index of a substring in a string
+console.log(airline.indexOf('AP')); //1
+console.log(airline.indexOf('Portugal')); //8
+console.log(airline.indexOf('portugal')); //-1
+
+// Extract substring starting from an index
+console.log(airline.slice(4)); //'Air Portugal': starts at index = 4 to the end of the string
+console.log(airline.slice(4, 7)); //'Air': starts at index = 4 to index = 7
+
+// Extract 1st word
+console.log(airline.slice(0, airline.indexOf(' '))); //'TAP'
+
+// Extract last word
+console.log(airline.slice(airline.lastIndexOf(' ') + 1)); //'Portugal'
+
+// Extract the last n characters (go from the end)
+console.log(airline.slice(-7)); //'Portugal': the last 7 characters
+
+console.log(airline.slice(4, -2)); //'Air Portug': from index = 1 to index = length - 2
+
+// Example
+const checkMiddleSeat = function(seat) {
+	// B and E are middle seats
+	const letter = seat.slice(-1); //get the last character
+	letter === 'B' || letter === 'E' ? console.log(`You got the middle seat`) : console.log(`You got a lucky seat`);
+};
+checkMiddleSeat('11B');
+checkMiddleSeat('23C');
+checkMiddleSeat('3E');
+
+// Why Strings are not objects but still have methods?
+// Javascript converts Strings to Objects behind the scene, and turn back to Strings when finish
+console.log(new String('ABC')); //{ 0: "A", 1: "B", 2: "C"}
+console.log(typeof new String('ABC')); //object
+
+/* Lec121. Working with Strings - Part 2 */
+
+console.log(airline.toLowerCase()); //Convert to lower case
+console.log('hello'.toUpperCase()); //Convert to upper case
+
+// Fix capitalization
+const myName = 'kAtHy';
+const myNameCorrect = myName[0].toUpperCase() + myName.toLowerCase().slice(1);
+console.log(myNameCorrect);
+
+// Check email address
+const exactEmail = 'kathy@example.com';
+const loginEmail = '  kAthY@Example.Com \n';
+
+////.trim(): remove space and \n at the begin and end of string
+const fixedEmail = loginEmail.trim().toLowerCase();
+
+console.log(fixedEmail);
+console.log(fixedEmail === exactEmail); //compare
+
+// Replace and replace all (case sentitive)
+//// Convert price
+const priceGB = '288,97£';
+const priceUS_1 = priceGB.replace('£', '$').replace(',', '.');
+const priceUS_2 = priceUS_1.slice(-1) + priceUS_1.slice(0, -1);
+console.log(priceUS_2);
+
+//// Replace all
+const announcement = 'All passengers come to boarding door 23. Boarding door 23!';
+console.log(announcement.replace('All', 'Male'));
+console.log(announcement.replaceAll('door', 'gate'));
+console.log(announcement.replace(/door/g, 'gate')); //use regular expression (g: global)
+
+// Check if string includes a substring: .includes()
+const planeModel = 'Airbus A320neo';
+console.log(planeModel.includes('neo')); //true
+console.log(planeModel.includes('B')); //false
+
+// Check if string starts/ends with a substring: .startsWith()
+console.log(planeModel.startsWith('Air')); //true
+console.log(planeModel.startsWith('A320')); //false
+console.log(planeModel.endsWith('neo')); //true
+console.log(planeModel.endsWith('A320')); //false
+
+/* Lec122. Working with Strings - Part 3 */
+// Split
+console.log('The_Most_Beautiful_Moment_In_Life'.split('_'));
+const [ myFirstName, myLastName ] = 'Kathy Pham'.split(' ');
+console.log(myFirstName, myLastName);
+
+// Join
+const newName = [ 'Ms.', myFirstName, myLastName.toUpperCase() ].join('---');
+console.log(newName);
+
+// Practice: Capitalize the 1st character of a name
+const capitalizeName = function(name) {
+	const names = name.split(' '),
+		result = [];
+	for (const word of names) {
+		// Capitalize the 1st character
+
+		//// Method 1
+		//result.push(word[0].toUpperCase() + word.slice(1).toLowerCase());
+
+		//// Method 2
+		result.push(word.replace(word[0], word[0].toUpperCase()));
+	}
+	return result.join(' ');
+};
+const name1 = 'jessica anna smith davis';
+console.log(capitalizeName(name1)); //Jessica Anna Smith Davis
+
+// Padding strings (add a number of characters to the string until it has a certain desired length)
+const message = 'Go to gate 23';
+console.log(message.padStart(25, '-')); //add '-' at the start of the string to have length = 25
+console.log(message.padEnd(25, '!')); //add '!' at the end of the string to have length = 25
+
+// Practice: Hide credit card number digits, just keep the last 3 digits
+const maskCreditCard = function(number) {
+	const strNumber = number + ''; //convert number to string
+	const masked = strNumber.slice(-3); //take the last 3 digits
+	console.log(masked);
+	return masked.padStart(strNumber.length, '*');
+};
+console.log(maskCreditCard('0335767333')); ///*******333
+
+// Repeat: repeat same string multiple times
+const repeatingMessage = 'Hello...';
+console.log(repeatingMessage.repeat(5)); //'Hello...Hello...Hello...Hello...Hello...': repeat 5 times
+const customersInLine = function(n_male, n_female) {
+	console.log(`There are ${n_male} male customers in line ${'🙎‍♂️'.repeat(n_male)}`);
+	console.log(`There are ${n_female} female customers in line ${'🙎‍♀️'.repeat(n_female)}`);
+};
+customersInLine(3, 5);
