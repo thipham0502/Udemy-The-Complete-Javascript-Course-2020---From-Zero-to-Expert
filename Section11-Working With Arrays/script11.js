@@ -148,3 +148,50 @@ const movementsDescription = movements.map((value, i, arr) => {
 	return `${i + 1}. You ${value > 0 ? 'deposited' : 'withdrew'} ${Math.abs(value)}`;
 });
 console.log(movementsDescription);
+
+/* Lec149. The filter method */
+console.log('----------Lec149----------');
+const deposits = movements.filter(function(mov) {
+	// Filter to keep only positive movements
+	return mov > 0;
+});
+console.log(deposits);
+
+// same as:
+const depositsFor = [];
+for (const mov of movements) if (mov > 0) depositsFor.push(mov);
+console.log(depositsFor);
+
+// NOTE: Should use methods (map, filter, ...) instead of for-of because we can make chain of methods (eg: arr.filter().map().join()...)
+
+const withdrawals = movements.filter((mov) => mov < 0);
+// Filter to keep only negative movements
+console.log(withdrawals);
+
+/* Lec150. The reduce Method */
+// Return 1 calculated value
+console.log('----------Lec150----------');
+
+// reduce: 2 arguments:
+//// callback function(<accumulator: the return value>, <current value>, <index>, <whole array>)
+//// initial value for accumulator
+const balance = movements.reduce(function(acc, curr, i, arr) {
+	console.log(`Iteration ${i + 1}: acc = ${acc} + ${curr} = ${acc + curr}`);
+	// sum up all movements
+	return acc + curr;
+}, 0);
+console.log(balance);
+
+// same as:
+let balanceFor = 0;
+for (const mov of movements) balanceFor += mov;
+console.log(balanceFor);
+
+// Use arrow function for short
+const balanceArrow = movements.reduce((acc, curr) => acc + curr, 0);
+console.log(balanceArrow);
+
+// Get max value in 'movements' array
+const maxBalance = movements.reduce((acc, mov) => (acc > mov ? acc : mov), movements[0]);
+console.log(movements);
+console.log(maxBalance);

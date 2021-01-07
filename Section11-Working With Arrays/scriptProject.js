@@ -138,3 +138,14 @@ createUserNames = function(accounts) {
 };
 createUserNames(accounts);
 console.log(accounts);
+
+/* Lec150. The reduce method */
+console.log('----------Lec150----------');
+// Calculate the current balance (current money in the account)
+const calcDisplayBalance = function(movements) {
+	const balance = movements.reduce((acc, mov) => acc + mov, 0);
+
+	// Display in labelBalance element
+	labelBalance.textContent = `${balance}€`;
+};
+calcDisplayBalance(account1.movements);

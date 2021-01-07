@@ -22,6 +22,12 @@ const age1 = calcAge1(1998); //declaration can be called before creating the fun
 function calcAge1(birthYear) {
 	return 2020 - birthYear;
 }
+const s = sum(3, 4, 5);
+function sum(x, y, z) {
+	return x + y + z;
+}
+console.log(`-----${s}`);
+
 //const age1 = calcAge1(1998);
 console.log('Age 1 =', age1);
 
@@ -92,7 +98,7 @@ console.log(arr1); //["z", "a", "b", "c", "d"]
 console.log(arr1.shift()); //"z"
 console.log(arr1); //["a", "b", "c", "d"]
 
-// indexof: return te index of the value (just the first position found)
+// indexof: return the index of the value (just the first position found)
 console.log(arr1.indexOf('b')); //1
 console.log(arr1.indexOf('m')); //-1
 
@@ -117,11 +123,16 @@ const myInfo = {
         and my favorite colors are ${this.favColors}.`;
 	}
 };
+console.log(`++++++`);
 console.log(myInfo);
+console.log(`++++++`);
 
 /* Lec43. Dot vs. Bracket Notation */
 console.log(myInfo.firstName);
+myInfo.calcAge();
+console.log(myInfo.age);
 console.log(myInfo['age']);
+
 // const info = prompt('What do you want to know about me (choose between firstName, lastName, birthYear, job, favColors:');
 
 // if (myInfo[info]) console.log(`This is my ${info}: ${myInfo[info]}`);
@@ -130,7 +141,7 @@ console.log(myInfo['age']);
 myInfo['height'] = 160;
 myInfo.address = 'HCMC';
 console.log(myInfo);
-console.log(`My name is ${myInfo.firstName} and I like ${myInfo.favColors.length} colors 
+console.log(`My name is ${myInfo.firstName} and I like ${myInfo.favColors.length} colors
 and ${myInfo.favColors[0]} is the color I like the most`);
 
 console.log(myInfo.calcAge()); // must call the function first to create the 'age' property
@@ -151,6 +162,7 @@ for (let i = 0; i < arr2.length; i++) {
 	console.log(arr2[i], typeof arr2[i]);
 	types.push(typeof arr2[i]);
 }
+console.log('!!!');
 console.log(types);
 
 /* Lec48. Looping Backwards and Loops in Loops */
@@ -158,7 +170,6 @@ console.log(types);
 let i = 10;
 while (i > 0) {
 	let dice = Math.random() * 6; //random(): randoming 10 values between 0,1
-	console.log(`Throw ${i} times: value = ${dice}
-    dice = ${Math.trunc(dice) + 1}`);
+	console.log(`Throw ${i} times: value = ${dice} dice = ${Math.trunc(dice) + 1}`);
 	i--;
 }
