@@ -4,35 +4,61 @@
 // Demo at: https://bankist.netlify.app/
 
 //////// DATA \\\\\\\\
-const account1 = {
+let account1 = {
 	owner: 'Jonas Schmedtmann',
-	movements: [ 200, 450, -400, 3000, -650, -130, 70, 1300 ],
+	movements: [ 200, 455.23, -306.5, 25000, -642.21, -133.9, 79.97, 1300 ],
 	interestRate: 1.2, // %
-	pin: 1111
+	pin: 1111,
+
+	movementsDates: [
+		'2019-11-18T21:31:17.178Z',
+		'2019-12-23T07:42:02.383Z',
+		'2020-01-28T09:15:04.904Z',
+		'2020-04-01T10:17:24.185Z',
+		'2020-05-08T14:11:59.604Z',
+		'2020-05-27T17:01:17.194Z',
+		'2020-07-11T23:36:17.929Z',
+		'2020-07-12T10:51:36.790Z'
+	],
+	currency: 'EUR',
+	locale: 'pt-PT' // de-DE
 };
 
-const account2 = {
+let account2 = {
 	owner: 'Jessica Davis',
 	movements: [ 5000, 3400, -150, -790, -3210, -1000, 8500, -30 ],
 	interestRate: 1.5,
-	pin: 2222
+	pin: 2222,
+
+	movementsDates: [
+		'2019-11-01T13:15:33.035Z',
+		'2019-11-30T09:48:16.867Z',
+		'2019-12-25T06:04:23.907Z',
+		'2020-01-25T14:18:46.235Z',
+		'2020-02-05T16:33:06.386Z',
+		'2020-04-10T14:43:26.374Z',
+		'2020-06-25T18:49:59.371Z',
+		'2020-07-26T12:01:20.894Z'
+	],
+	currency: 'USD',
+	locale: 'en-US'
 };
 
-const account3 = {
+let account3 = {
 	owner: 'Steven Thomas Williams',
 	movements: [ 200, -200, 340, -300, -20, 50, 400, -460 ],
 	interestRate: 0.7,
 	pin: 3333
 };
 
-const account4 = {
+let account4 = {
 	owner: 'Sarah Smith',
 	movements: [ 430, 1000, 700, 50, 90 ],
 	interestRate: 1,
 	pin: 4444
 };
 
-const accounts = [ account1, account2, account3, account4 ]; //array of objects
+let accounts = [ account1, account2, account3, account4 ]; //array of objects
 
 //////// ELEMENTS \\\\\\\\
 const labelWelcome = document.querySelector('.welcome');
@@ -83,10 +109,16 @@ const displayMovements = function(movementsArr, sort = false) {
 		//     <div class="movements__date">3 days ago</div> // not now
 		//     <div class="movements__value">4 000€</div>
 		// </div>
+
+		/* Lec167. Math and Rounding */
+		//----------Lec167----------
+		// Rounding movements to a 2 decimal characters --> .toFixed(2)
+		const amount = Math.floor(inputLoanAmount.value);
+		// --------------------
 		const html = `
             <div class="movements__row">
                 <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-                <div class="movements__value">${mov}</div>
+                <div class="movements__value">${mov.toFixed(2)}</div>
             </div>`;
 
 		// Add 'html' to element with class="movements" ('containerMovements' variable)
@@ -153,7 +185,11 @@ const calcDisplayBalance = function(account) {
 	account.balance = account.movements.reduce((acc, mov) => acc + mov, 0);
 
 	// Display in labelBalance element
-	labelBalance.textContent = `${account.balance}€`;
+	/* Lec167. Math and Rounding */
+	//----------Lec167----------
+	// Rounding balance to a 2 decimal characters --> .toFixed(2)
+	// labelBalance.textContent = `${account.balance}€`;
+	labelBalance.textContent = `${account.balance.toFixed(2)}€`;
 };
 // calcDisplayBalance(account1.movements);
 
@@ -168,14 +204,22 @@ const calcDisplaySummary = function(account) {
 		console.log(`${acc} + ${mov} = ${acc + mov}`);
 		return acc + mov;
 	}, 0);
-	labelSumIn.textContent = `${incomes}€`; //html element displaying incomes
+
+	/* Lec167. Math and Rounding */
+	//----------Lec167----------
+	// Rounding incomes to a 2 decimal characters --> .toFixed(2)
+	labelSumIn.textContent = `${incomes.toFixed(2)}€`; //html element displaying incomes
 
 	console.log('___Outcomes___');
 	const outcomes = account.movements.filter((mov) => mov < 0).reduce((acc, mov) => {
 		console.log(`${acc} + ${mov} = ${acc + mov}`);
 		return acc + mov;
 	}, 0);
-	labelSumOut.textContent = `${Math.abs(outcomes)}€`; //html element displaying outcomes
+
+	/* Lec167. Math and Rounding */
+	//----------Lec167----------
+	// Rounding outcomes to a 2 decimal characters --> .toFixed(2)
+	labelSumOut.textContent = `${Math.abs(outcomes).toFixed(2)}€`; //html element displaying outcomes
 
 	console.log('___Interests___'); //Interests on deposits, interest = 1.2 * deposit, only if interest >= 1€
 	const interest = account.movements
@@ -186,7 +230,11 @@ const calcDisplaySummary = function(account) {
 			return interest >= 1;
 		}) //filter interest >= 1€
 		.reduce((acc, interest) => acc + interest, 0);
-	labelSumInterest.textContent = `${interest}€`; //html element displaying interests
+
+	/* Lec167. Math and Rounding */
+	//----------Lec167----------
+	// Rounding interest to a 2 decimal characters --> .toFixed(2)
+	labelSumInterest.textContent = `${interest.toFixed(2)}€`; //html element displaying interests
 
 	console.log(incomes, outcomes, interest);
 	// let income, outcome, interest;
@@ -334,7 +382,12 @@ btnLoan.addEventListener('click', function(event) {
 	//NOTE: Fill the form and press 'Enter' will automatically activate 'click' event of the button
 	event.preventDefault();
 
-	const amount = Number(inputLoanAmount.value);
+	/* Lec167. Math and Rounding */
+	console.log('----------Lec167----------');
+	// Rounding DOWN loan amount --> use Math.floor()
+	const amount = Math.floor(inputLoanAmount.value);
+	// --------------------
+
 	if (amount > 0 && currentAccount.movements.some((mov) => mov >= amount * 0.1)) {
 		// Add movement
 		currentAccount.movements.push(amount);
@@ -411,4 +464,15 @@ labelBalance.addEventListener('click', function() {
 	const sumMovs = movementsUI.reduce((curr, mov) => curr + mov);
 	console.log('Sum of all movements:');
 	console.log(sumMovs);
+});
+
+/* Lec168. The Remainder Operator */
+console.log('----------Lec168----------');
+
+// Fun practice: Click the logo --> rows with even index will be yellow
+document.querySelector('.logo').addEventListener('click', function() {
+	console.log('----------Clicked----------');
+	[ ...document.querySelectorAll('.movements__row') ].forEach(function(row, i) {
+		if (i % 2 === 0) row.style.backgroundColor = 'yellow';
+	});
 });

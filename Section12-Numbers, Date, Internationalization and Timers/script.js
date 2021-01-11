@@ -9,6 +9,10 @@
 
 // DIFFERENT DATA! Contains movement dates, currency and locale
 
+
+/* Lec166. Converting and Checking Numbers */
+console.log('----------Lec166----------');
+
 const account1 = {
   owner: 'Jonas Schmedtmann',
   movements: [200, 455.23, -306.5, 25000, -642.21, -133.9, 79.97, 1300],
