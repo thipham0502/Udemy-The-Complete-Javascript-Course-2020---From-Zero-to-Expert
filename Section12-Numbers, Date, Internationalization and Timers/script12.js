@@ -55,6 +55,10 @@ console.log(Number.isInteger(15 / 0)); //Infinity --> false
 /* Lec167. Math and Rounding */
 console.log('----------Lec167----------');
 
+// Math.abs(): Absolute
+console.log('---Math.abs()---');
+console.log(Math.abs(-25)); //25
+
 // Math.sqrt(): square root
 console.log('---Math.sqrt()---');
 console.log(Math.sqrt(25)); //5
@@ -194,7 +198,7 @@ console.log('----------Lec170----------');
 // Create a date
 console.log('_______________Create a date_______________');
 //// Method #1: use constructor new Date()
-const now = new Date(); //get current date
+let now = new Date(); //get current date
 console.log(now);
 
 //// Method #2: Parse from a date string
@@ -210,7 +214,7 @@ console.log(new Date(3600000 * 24 * 2)); //add 2 days to Unix time (03/01/1970 0
 
 // Working with dates
 console.log('_______________Working with dates_______________');
-const future = new Date(2026, 1, 2, 20, 10, 50);
+let future = new Date(2026, 1, 2, 20, 10, 50);
 console.log(future); //2026
 console.log(future.getFullYear()); //Mon Feb 02 2026 20:00:00 GMT+0700 (Indochina Time)
 console.log(future.getMonth()); //1 (month starts with 0 (0: Jan --> 11: Dec))
@@ -221,10 +225,11 @@ console.log(future.getMinutes()); //10
 console.log(future.getSeconds()); //50
 console.log(future.toISOString()); //'2026-02-02T13:10:50.000': International format string
 console.log(future.getTime()); //timestamp of the date (the number of milliseconds added to Unix time i.e. 01/01/1970 07:00:00 GMT+700)
+console.log(+future); //or add a '+' before to get the timestamp
 console.log(new Date(1770037850000)); //create date from timestamp
 // --> We can convert timestamp to date and vice versa
 
-console.log(Date.now()); //get current timestamp
+console.log(`Current timestamp: ${Date.now()}`); //get current timestamp
 
 future.setFullYear(2035); //change the year
 future.setMonth(3); //change the month
@@ -234,3 +239,230 @@ future.setHours(15); //change the hour
 future.setMinutes(30); //change the hour
 future.setSeconds(28); //change the hour
 console.log(future);
+
+/* Lec172. Operations with Dates */
+console.log('----------Lec172----------');
+// Perform calculations with timestamps
+future = new Date(2026, 1, 2, 20, 10, 50);
+console.log(future);
+console.log(+future); //Convert to timestamp (milliseconds)
+
+// Calculate difference between 2 days in milliseconds
+const calcDaysPassed = (date1, date2) => Math.abs(date2 - date1);
+const date1 = new Date(1998, 2, 5),
+	date2 = new Date(2002, 12, 5);
+const diffMilSecs = calcDaysPassed(date1, date2); //difference between date1 & date2 in milliseconds
+const diffDays = diffMilSecs / 1000 / 60 / 60 / 24; //difference between date1 & date2 in days
+// /1000 -> seconds     /60 -> minutes       /60 -> hours     /24 -> days
+console.log(`Difference between date1 & date2 = ${diffDays} days`);
+
+/* Lec173. Internationalization API (Intl) - Dates */
+console.log('----------Lec173----------');
+// Allow us to format numbers, strings, dates, lists, ... (can check in MDN) according to difference languages (locales) around the world Ex: currencies or dates are represented in a different way in Europe/U.S/Asia/...
+now = new Date();
+console.log(now);
+
+// Use Intl() API to format date for a locale: Intl.DateTimeFormat(<locale string>, <options>).format(<date variable>)
+// locale string: '<language>-<COUNTRY>'
+// see full table of locale string: http://www.lingoes.net/en/translator/langcode.htm (ISO Language Code Table)
+let intlDate = new Intl.DateTimeFormat('en-US').format(now); //English-US format: 'm-dd-yyyy' (1/12/2021)
+intlDate = new Intl.DateTimeFormat('en-GB').format(now); //English-GreatBritain (UK) format: 'dd-mm-yyyy' (12/01/2021)
+intlDate = new Intl.DateTimeFormat('ja-JP').format(now); //Japanese-Japan format: 'yyyy-m-dd' (2021/1/12)
+intlDate = new Intl.DateTimeFormat('vi-VN').format(now); //Vietnamese-VN format: 'dd-m-yyyy' (12/1/2021)
+console.log(intlDate);
+
+// Customize format string
+let options = {
+	// weekday: 'long', //Monday, Tuesday, ...
+	weekday: 'short', //Mon, Tue, ...
+	// weekday: 'narrow', //M, T, W, T, ...
+
+	day: 'numeric',
+
+	// month: 'numeric', //1, 2, 3, 4, ...
+	// month: '2-digit', //01, 02, 03, 04, ...
+	month: 'long', //January, February, ...
+
+	year: 'numeric', //2020, 2021, ...
+	// year: '2-digit', //20, 21, ...
+
+	hour: 'numeric',
+	minute: 'numeric'
+};
+//// Add options to customize
+// intlDate = new Intl.DateTimeFormat('vi-VN', options).format(now); //11:40, 12 tháng 1
+now = new Date(2021, 0, 12, 11, 11, 0);
+intlDate = new Intl.DateTimeFormat('en-US', options).format(now); //Tue, January 12, 2021, 11:11 AM
+intlDate = new Intl.DateTimeFormat('pt-PT', options).format(now); //Portuguese-Portugal: terça, 12 de janeiro de 2021, 11:11
+console.log(intlDate);
+
+// Get the locale from browser
+const locale = navigator.language;
+console.log(`Locale: ${locale}`); //en-US
+intlDate = new Intl.DateTimeFormat(locale, options).format(now);
+console.log(intlDate);
+
+/* Lec174. Internationalization API (Intl) - Numbers */
+console.log('----------Lec174----------');
+// Use Intl() API to format numbers for a locale with difference purposes such as currency, percent, unit, ...: Intl.NumberFormat(<locale string>, <options>).format(<date variable>)
+
+// Similar to Intl with Date in Lec173 \\
+const num = 123456.789;
+console.log('US:', new Intl.NumberFormat('en-US').format(num)); //123,456.789
+console.log('Germany:', new Intl.NumberFormat('de-DE').format(num)); //123.456,789
+console.log('VN:', new Intl.NumberFormat('vi-VN').format(num)); //123.456,789
+console.log(`${navigator.language}:`, new Intl.NumberFormat(navigator.language).format(num)); //123,456.789
+
+// Customize format string
+//// Add unit (đơn vị đo)
+////// Speed: mile-per-hour
+options = {
+	style: 'unit',
+	unit: 'mile-per-hour'
+};
+console.log('-----Speed: mile-per-hour-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //123,456.789 mph
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123.456,789 mi/h
+
+////// Temperature: celsius
+options = {
+	style: 'unit',
+	unit: 'celsius'
+};
+console.log('-----Temperature: celsius-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //123,456.789°C
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123.456,789°C
+
+//// Add percentage (%)
+options = {
+	style: 'percent'
+};
+console.log('-----Percentage-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //123,456.789%
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123.456,789%
+
+//// Add currency
+// NOTE: Currency is rounded to 2 decimals
+////// EUR
+options = {
+	style: 'currency',
+	currency: 'EUR'
+};
+console.log('-----Percentage-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //€123,456.79
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123.456,79 €
+
+////// USD
+options = {
+	style: 'currency',
+	currency: 'USD'
+};
+console.log('-----Percentage-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //$123,456.79
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123.456,79 US€
+
+////// VND
+options = {
+	style: 'currency',
+	currency: 'VND'
+};
+console.log('-----Percentage-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //₫123,456.79
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123.456,79 ₫
+
+//// Add grouping
+// NOTE: Currency is rounded to 2 decimals
+////// EUR
+options = {
+	style: 'currency',
+	currency: 'EUR',
+	useGrouping: false //no thousand separators (10000 is 10000, not 10.000)
+};
+console.log('-----useGrouping = false-----');
+console.log('US:', new Intl.NumberFormat('en-US', options).format(num)); //€123456.79
+console.log('VN:', new Intl.NumberFormat('vi-VN', options).format(num)); //123456,79 €
+
+// We can combine all options in 1 (based on the 'style' to get the suitable properties, the other properties will be ignored)
+options = {
+	style: 'currency',
+	unit: 'celsius',
+	currency: 'EUR',
+	useGrouping: false
+};
+//// Here we have style = 'currency' => ignore the 'unit' property
+
+// For more Intl Numbers options --> check on MDN
+
+/* Lec175. Timers: setTimeOut and setInterval */
+console.log('----------Lec175----------');
+// setTimeOut(<callback function>, <milliseconds to delay before calling the function>): runs and executes the callback function just once after a defined time
+// setInterval(): keeps running and executing the callback function until we stop it (Ex: runs every 5 seconds)
+
+//// setTimeout() \\\\
+console.log('Start waiting');
+setTimeout(() => console.log('1 second...'), 1000); //call the function after 1 milliseconds
+setTimeout(() => console.log('2 seconds...'), 2000); //call the function after 2 milliseconds
+setTimeout(() => console.log('3 seconds! Time out!'), 3000); //call the function after 3 milliseconds
+// While waiting, any codes after it still run as usual
+console.log('Testing timer while waiting 1');
+console.log('Testing timer while waiting 2');
+console.log('Testing timer while waiting 3');
+
+//// Output:
+// Start waiting (*)
+// Testing timer while waiting 1 (*)
+// Testing timer while waiting 2 (*)
+// Testing timer while waiting 3 (*)
+// 1 second...
+// 2 seconds...
+// 3 seconds! Time out!
+// NOTE: all 3 lines (*) are executed at the same time
+
+// Add arguments to callback function and setTimeOut()
+// setTimeOut(<callback function>, <delay time>, <function's arguments>)
+//// Ex: Make a pizza from 2 ingredients
+setTimeout(
+	function(ingred1, ingred2) {
+		console.log(`Here is your pizza with ${ingred1} and ${ingred2}`);
+	},
+	3000,
+	'Mushroom',
+	'Cheese'
+);
+
+// We can cancel executing the function before the timer starts
+const ingredients = [ 'olives', 'spinach', 'mushroom' ];
+const pizzaTimer = setTimeout(
+	function(...ingredients) {
+		console.log(`Here is your pizza with ${ingredients.join(' and ')}`);
+	},
+	3000,
+	...ingredients //use Spread operator '...'
+);
+//// If ingredients have 'spinach', then we cancel the timer, i.e. dont execute anything
+if (ingredients.includes('spinach')) clearTimeout(pizzaTimer);
+
+//// setInterval() \\\\
+// Display the current date time in every second
+// setInterval(function(stopTime) {
+// 	const now = new Date();
+// 	console.log(now);
+// }, 1000);
+
+// clearInterval(): Stop the timer
+//// Function to stop the timer after a given seconds
+const startAndStop = function(seconds) {
+	let startTime = 1;
+	//// We must define a variable to hold the timer so that we can pass the variable to function clearInterval()
+	const intervalTimer = setInterval(() => {
+		console.log(startTime);
+		if (startTime === seconds) clearInterval(intervalTimer); //call function to stop the timer
+		startTime++;
+	}, 1000);
+};
+startAndStop(5); //stops after 5 secs
+
+/* Lec176. Implement a countdown timer */
+console.log('----------Lec176----------');
+// Log out users after some inactive time (ex: after 5mins without doing anything)
+// Continue in scriptProject.js

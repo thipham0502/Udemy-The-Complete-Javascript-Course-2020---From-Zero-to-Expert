@@ -1,4 +1,4 @@
-'use script';
+'use strict';
 
 /* Challenge #1:
 Let's build a simple poll app!

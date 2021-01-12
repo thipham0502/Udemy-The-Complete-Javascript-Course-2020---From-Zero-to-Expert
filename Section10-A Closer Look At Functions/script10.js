@@ -1,4 +1,4 @@
-'use script';
+'use strict';
 
 /* Lec126. Default Parameters */
 console.log('----------Lec126----------');
