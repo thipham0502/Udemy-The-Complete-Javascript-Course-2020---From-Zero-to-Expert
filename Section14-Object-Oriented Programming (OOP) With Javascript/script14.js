@@ -217,7 +217,8 @@ class PersonClass {
 	// First, we must add a constructor with arguments are properties for the class
 	// Everything created inside constructor is own properties, not included in prototype
 	constructor(firstName, birthYear) {
-		(this.firstName = firstName), (this.birthYear = birthYear);
+		this.firstName = firstName;
+		this.birthYear = birthYear;
 	}
 
 	// Add methods to prototype (everything created outside of constructor will be added to the instance's prototype)
@@ -250,3 +251,149 @@ thi.greet();
 // --> Both are fine
 // But class {} gather all things together
 // while using Constructors is more messy
+
+/* Lec209. Setters and Getters */
+console.log('----------Lec209----------');
+// Getters and Setters are Accessor Properties
+// Others are Data Properties
+
+// Getter and Setter in Objects
+const account = {
+	owner: 'Kathy',
+	movements: [ 100, 220, 150, 180, 250 ],
+
+	// Create Getter to get the lastest movements
+	get latest() {
+		return this.movements.slice(-1).pop();
+	},
+
+	set lastest(mov) {
+		this.movements.push(mov);
+	}
+};
+console.log(account.latest); //call as a property, not account.latest()
+
+account.lastest = 50; //set property
+console.log(account.movements); //[100, 220, 150, 180, 250, 50]
+
+// Getter and Setter in Classes
+class PersonClass1 {
+	constructor(fullName, birthYear) {
+		(this.fullName = fullName), (this.birthYear = birthYear);
+	}
+	calcAge() {
+		console.log(`${this.fullName}'s age is: ${2020 - this.birthYear}`);
+	}
+
+	// Getter
+	get age() {
+		return 2020 - this.birthYear;
+	}
+
+	// Setter
+	// Change property that already exists in the constructor -> must create different property name
+	set fullName(name) {
+		if (name.includes(' '))
+			this._fullName = name; //_fullName != fullName
+		else console.log(`${name} is not a full name!`);
+	}
+	// Getter: get value of new property _fullName, but still can access by .fullName
+	get fullName() {
+		return this._fullName;
+	}
+}
+const kathy1 = new PersonClass1('Kathy Pham', 1998);
+
+console.log(kathy1.age); //22 (call getter as a property of the instance)
+console.log(kathy1); //has assessor property 'age'
+
+kathy1.fullName = 'Thi Pham'; //call setter fullName()
+console.log(kathy1); //has Data property '_fullName', and Accessor property 'fullName'
+console.log(kathy1._fullName); //'Thi Pham'
+console.log(kathy1.fullName); //'Thi Pham'
+
+/* Lec210. Static Methods */
+console.log('----------Lec210----------');
+// A method that is attached to the constructor of a class (the method is in the class's name space and is static on the class's constructor), not to the prototype. --> The class's instances don't inherit this method and so cannot use it
+
+// NOTE: Non-static methods are called Instance methods, they are added to the prototype and can be accessed by instances (Lec204)
+// While Static methods are added directly to the class itself, and cannot be accessed by instances
+
+//// Ex: .parseInt() method is attached to Number constructor
+//// --> All the instances cannot use this method
+console.log(Number.parseInt('12'));
+// '12'.parseInt(); //error!
+
+// *Add a static method to the constructor
+//// Constructor for class Human
+const Human = function(fullName, age) {
+	this.fullName = fullName;
+	this.age = age;
+};
+//// Static methods are added directly to the class itself
+Human.greet = function() {
+	console.log('Hello');
+};
+Human.greet(); //call static method directly from the class itself
+
+const obama = new Human('Barack Obama', 60);
+// obama.greet(); // Instance of class 'Human' cannot access static methods
+
+// *Add a static method to the ES6 class
+class Child {
+	constructor(gender, birthYear) {
+		this.gender = gender;
+		this.birthYear = birthYear;
+	}
+	// Instance method
+	calcAge() {
+		return now.getFullYear() - this.birthYear;
+	}
+
+	// Add static method
+	static sayHi() {
+		console.log('Hi');
+	}
+}
+Child.sayHi();
+
+const child1 = new Child('Male', 2018);
+// child1.sayHello(); //instance cannot access static method
+
+/* Lec211. Object.create */
+console.log('----------Lec211----------');
+// The 3rd way to implement Prototypal Inheritance (besides Constructor functions and ES6 Classes, but there are no prototype properties
+// Using Object.create, we can set the prototype manually to any instances
+
+// Create a prototype
+const PersonProto = {
+	// Initialize values (just like a constructor)
+	init(firstName, birthYear) {
+		this.firstName = firstName;
+		this.birthYear = birthYear;
+	},
+	calcAge() {
+		return new Date().getFullYear() - this.birthYear;
+	}
+};
+
+// Create new instance linked to the prototype
+const person1 = Object.create(PersonProto); //person1 is now an empty object and is linked to PersonProto prototype object, and PersonProto becomes person1's prototype
+
+person1.init('Peter', 1990);
+console.log(person1);
+console.log(person1.__proto__); //=== PersonProto
+console.log(person1.__proto__ === PersonProto); //true
+console.log(person1.calcAge());
+
+// *See more: Object.create and Constructor Functions Comparison.png
+
+/* Lec213. Inheritance Between "Classes": Constructor Functions */
+console.log('----------Lec213----------');
+const Person1 = function(firstName, birthYear) {
+	this.firstName = firstName;
+	this.birthYear = birthYear;
+};
+Person1.prototype.calcAge = function() {
+	console.log(new Date.getFullYear() - this.birthYear);
+};
