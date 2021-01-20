@@ -279,7 +279,8 @@ console.log(account.movements); //[100, 220, 150, 180, 250, 50]
 // Getter and Setter in Classes
 class PersonClass1 {
 	constructor(fullName, birthYear) {
-		(this.fullName = fullName), (this.birthYear = birthYear);
+		this.fullName = fullName;
+		this.birthYear = birthYear;
 	}
 	calcAge() {
 		console.log(`${this.fullName}'s age is: ${2020 - this.birthYear}`);
@@ -390,10 +391,210 @@ console.log(person1.calcAge());
 
 /* Lec213. Inheritance Between "Classes": Constructor Functions */
 console.log('----------Lec213----------');
+
+// Inheritance between Constructor Functions
 const Person1 = function(firstName, birthYear) {
 	this.firstName = firstName;
 	this.birthYear = birthYear;
 };
 Person1.prototype.calcAge = function() {
-	console.log(new Date.getFullYear() - this.birthYear);
+	console.log(new Date().getFullYear() - this.birthYear);
 };
+
+//// Student is also a Person, with some similar properties
+const Student = function(firstName, birthYear, course) {
+	// this.firstName = firstName;
+	// this.birthYear = birthYear;
+
+	// *Inherit properties from parent class Person1
+	// Person1.(firstName, birthYear); //error, 'this' is undefined
+	Person1.call(this, firstName, birthYear); //assign 'this'
+
+	// Add new property
+	this.course = course;
+};
+// *Make Student a sub-class of Person1: do manually using Object.create()
+Student.prototype = Object.create(Person1.prototype); //Student inherits Person1's prototype
+// Can't use: Student.prototype = Person1.prototype;
+
+// Add new method
+Student.prototype.introduce = function() {
+	console.log(`My name is ${this.firstName} and I study ${this.course}`);
+};
+const mike = new Student('Mike', 2001, 'Computer Science');
+console.log(mike);
+mike.introduce();
+
+console.log(mike.__proto__); //Student's prototype
+console.log(mike.__proto__.__proto__); //Person1's prototype
+console.log(mike.__proto__ === Student.prototype); //true
+console.log(mike instanceof Student); //true
+console.log(mike instanceof Person1); //true
+
+mike.calcAge(); //Student calling Person1's method
+
+// Because we have used Object.create() so Student's constructor is Person1 (instead of the class Student itself)
+console.dir(Student.prototype.constructor); //class Person1
+
+// To fix this:
+Student.prototype.constructor = Student;
+console.dir(Student.prototype.constructor); //class Student
+
+/* Lec215. Inheritance Between "Classes": ES6 Classes */
+console.log('----------Lec215----------');
+class PersonClass2 {
+	constructor(fullName, birthYear) {
+		this.fullName = fullName;
+		this.birthYear = birthYear;
+	}
+	calcAge() {
+		console.log(`${this.fullName}'s age is: ${2020 - this.birthYear}`);
+	}
+
+	// Getter
+	get age() {
+		return 2020 - this.birthYear;
+	}
+
+	// Setter
+	set fullName(name) {
+		if (name.includes(' '))
+			this._fullName = name; //_fullName != fullName
+		else console.log(`${name} is not a full name!`);
+	}
+
+	get fullName() {
+		return this._fullName;
+	}
+}
+// *Create class Student as a sub-class of class Person
+class StudentClass2 extends PersonClass2 {
+	constructor(fullName, birthYear, course) {
+		//'super' function: calling the constructor of the parent class
+		// create 'this' keyword in this sub-class, so we must call this function first
+		super(fullName, birthYear);
+
+		this.course = course;
+	}
+
+	// Add methods
+	introduce() {
+		console.log(`My name is ${this.fullName} and I study ${this.course}`);
+	}
+
+	// Overwrite parent class's method
+	get age() {
+		return new Date().getFullYear() - this.birthYear;
+	}
+}
+// *If there are no new properties in the child class:
+// class StudentClass2 extends PersonClass2 {} //just this
+
+const bob = new StudentClass2('Michael Bob', 1998, 'Mathematics');
+console.log(bob);
+
+bob.calcAge(); //call parent class's method
+bob.introduce(); //call child class's method
+console.log(bob.age);
+
+/* Lec216. Inheritance Between "Classes": Object.create */
+console.log('----------Lec216----------');
+// Create a prototype
+const PersonProto1 = {
+	// Initialize values (just like a constructor)
+	init(firstName, birthYear) {
+		this.firstName = firstName;
+		this.birthYear = birthYear;
+	},
+	calcAge() {
+		return new Date().getFullYear() - this.birthYear;
+	}
+};
+// const marie = Object.create(PersonProto1);
+
+// *Create a prototype inherits from PersonProto1
+const StudentProto1 = Object.create(PersonProto1); //PersonProto1 object is StudentProto1's prototype
+// *Create init() function (reuse from parent prototype PersonProto1)
+StudentProto1.init = function(firstName, birthYear, course) {
+	PersonProto1.init.call(this, firstName, birthYear);
+	this.course = course;
+};
+// Add methods
+StudentProto1.introduce = function() {
+	console.log(`My name is ${this.firstName} and I study ${this.course}`);
+};
+const jane = Object.create(StudentProto1); //StudentProto1 object is jane's prototype
+jane.init('Jane', 1995, 'Literature');
+jane.introduce();
+console.log(jane.calcAge()); //call method of parent class (Person)
+console.log(jane);
+
+// ==> PersonProto1 object is jane's parent prototype
+
+// Prototype chain
+//  _________________________
+// | 		Prototype		|
+// | 	 [PersonProto1]		|
+// |________________________|
+// 				^
+// 				| .__proto__
+//  _________________________
+// |		Prototype		|
+// |	 [StudentProto1]	| ---> StudentProto1 inherits from PersonProto1
+// | __proto__:PersonProto1 |
+// |________________________|
+// 				^
+// 				|
+//  ___________________________
+// |		  Object		  |
+// |		  [jane]		  | ---> jane inherits from StudentProto1
+// | __proto__: StudentProto1 |
+// |__________________________|
+
+/* Lec217. Another Class Example */
+console.log('----------Lec217----------');
+// Example from the Bankist app
+class Account {
+	constructor(owner, currency, pin) {
+		this.owner = owner;
+		this.currency = currency;
+		this.pin = pin;
+		this.movements = []; //set default value is empty array for all objects
+		this.locale = navigator.language; //set default value for all objects
+		console.log(`Thanks for opeing an account, ${this.owner}`);
+	}
+
+	// Add methods (API - Public Interface)
+	deposit(val) {
+		this.movements.push(val);
+	}
+	withdraw(val) {
+		this.deposit(-val); //calling other method inside a method
+	}
+
+	approveLoan(val) {
+		return val > 0;
+	}
+	requestLoan(val) {
+		if (this.approveLoan(val)) {
+			this.deposit(val);
+			console.log('Loan approved');
+		}
+	}
+}
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+console.log(acc1.movements);
+
+// *Push elements to movements array
+// acc1.movements.push(100);
+// acc1.movements.push(-50);
+// NOTE: It's a bad idea to do this way ---> Should create a method instead!
+acc1.deposit(100);
+acc1.withdraw(50); //instead of add -50, the minus sign "-" is "abstracted" away
+console.log(acc1.movements);
+
+// *Make some properties inaccessible from outside (ex: pin)
+console.log(acc1.pin);
+acc1.requestLoan(1000);
+acc1.approveLoan(1000);
