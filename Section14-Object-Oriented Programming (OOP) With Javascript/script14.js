@@ -39,7 +39,7 @@ console.log('----------Lec202----------');
 
 // Ex:
 const num = [1, 2, 3];
-num.map((v) => v * 2);
+num.map(v => v * 2);
 // Actually this map() function is written Array.prototype.map() on MDN
 // --> map() is a method of the prototype of all array objects (Array.prototype)
 // --> All arrays have access to this function
@@ -62,7 +62,7 @@ console.log('----------Lec203----------');
 
 // Constructor Functions will produce an object
 // NOTE: Traditional OOP Js doesn't really have classes, but we can use constructors to simulate classes. Constructor Functions are not really a feature of Js, they are created by developers and everyone just uses them.
-const Person = function (firstName, birthYear) {
+const Person = function(firstName, birthYear) {
     console.log(this); //Person{}: empty object
 
     // Add properties to the empty object --> Instance properties
@@ -101,7 +101,7 @@ console.log(arr instanceof Array); //true
 console.log('----------Lec204----------');
 
 // Add methods using prototype --> prevent creating methods inside every object
-Person.prototype.calcAge = function () {
+Person.prototype.calcAge = function() {
     console.log(2020 - this.birthYear);
 };
 console.log(Person.prototype); //has calcAge() function
@@ -191,7 +191,7 @@ console.log(arr1.__proto__ === Array.prototype); //true
 console.log(arr1.__proto__.__proto__); //Object.prototype
 
 //// Add new method for Array
-Array.prototype.unique = function () {
+Array.prototype.unique = function() {
     return [...new Set(this)];
 };
 console.log(arr1.unique()); //[1, 2, 3, 4, 5]
@@ -237,7 +237,7 @@ thi.calcAge();
 console.log(thi.__proto__); //calcAge() is added to 'thi' instance's prototype
 
 // Or you can add methods to prototype like this
-PersonClass.prototype.greet = function () {
+PersonClass.prototype.greet = function() {
     console.log(`Hey ${this.firstName}!`);
 };
 thi.greet();
@@ -327,12 +327,12 @@ console.log(Number.parseInt('12'));
 
 // *Add a static method to the constructor
 //// Constructor for class Human
-const Human = function (fullName, age) {
+const Human = function(fullName, age) {
     this.fullName = fullName;
     this.age = age;
 };
 //// Static methods are added directly to the class itself
-Human.greet = function () {
+Human.greet = function() {
     console.log('Hello');
 };
 Human.greet(); //call static method directly from the class itself
@@ -393,16 +393,16 @@ console.log(person1.calcAge());
 console.log('----------Lec213----------');
 
 // Inheritance between Constructor Functions
-const Person1 = function (firstName, birthYear) {
+const Person1 = function(firstName, birthYear) {
     this.firstName = firstName;
     this.birthYear = birthYear;
 };
-Person1.prototype.calcAge = function () {
+Person1.prototype.calcAge = function() {
     console.log(new Date().getFullYear() - this.birthYear);
 };
 
 //// Student is also a Person, with some similar properties
-const Student = function (firstName, birthYear, course) {
+const Student = function(firstName, birthYear, course) {
     // this.firstName = firstName;
     // this.birthYear = birthYear;
 
@@ -418,7 +418,7 @@ Student.prototype = Object.create(Person1.prototype); //Student inherits Person1
 // Can't use: Student.prototype = Person1.prototype;
 
 // Add new method
-Student.prototype.introduce = function () {
+Student.prototype.introduce = function() {
     console.log(`My name is ${this.firstName} and I study ${this.course}`);
 };
 const mike = new Student('Mike', 2001, 'Computer Science');
@@ -515,12 +515,12 @@ const PersonProto1 = {
 // *Create a prototype inherits from PersonProto1
 const StudentProto1 = Object.create(PersonProto1); //PersonProto1 object is StudentProto1's prototype
 // *Create init() function (reuse from parent prototype PersonProto1)
-StudentProto1.init = function (firstName, birthYear, course) {
+StudentProto1.init = function(firstName, birthYear, course) {
     PersonProto1.init.call(this, firstName, birthYear);
     this.course = course;
 };
 // Add methods
-StudentProto1.introduce = function () {
+StudentProto1.introduce = function() {
     console.log(`My name is ${this.firstName} and I study ${this.course}`);
 };
 const jane = Object.create(StudentProto1); //StudentProto1 object is jane's prototype
@@ -737,3 +737,113 @@ console.log(acc3.pin); //undefined
 
 // Access static methods of class
 Account2.helper();
+
+/* Lec220. Chaining Methods */
+console.log('----------Lec220----------');
+// Return the object in functions to call in chain
+class Account3 {
+    locale = navigator.language;
+    #movements = [];
+    #pin;
+
+    constructor(owner, currency, pin) {
+        this.owner = owner;
+        this.currency = currency;
+        this.#pin = pin;
+        console.log(`Thanks for opeing an account, ${this.owner}`);
+    }
+
+    // *Define public methods
+    getMovements() {
+        return this.#movements;
+    }
+    deposit(val) {
+        this.#movements.push(val);
+        return this; //return the object
+    }
+    withdraw(val) {
+        this.deposit(-val);
+        return this; //return the object
+    }
+    requestLoan(val) {
+        if (this.#approveLoan(val)) {
+            this.deposit(val);
+            console.log('Loan approved');
+            return this; //return the object
+        }
+    }
+    #approveLoan(val) {
+        return val > 0;
+    }
+    static helper() {
+        console.log('Helper');
+    }
+}
+const acc4 = new Account3('Kathy', 'EUR', 2222);
+acc4.deposit(100)
+    .withdraw(50)
+    .requestLoan(150); //chaining
+console.log(acc4);
+console.log(acc4.getMovements());
+
+/* Lec221. ES6 Classes Summary */
+console.log('----------Lec221----------');
+
+// *'extends': create inheritance between classes, automatically sets prototype
+class StudentClass3 extends PersonClass2 {
+    university = 'University of Science'; //public field (similar to property, available on every instance, same value for all instances)
+    #studyHours = 0; //private field (not accessible outside the class, same value for all instances)
+    #course; //private field (not accessible outside the class, value is customized in the constructor)
+    static numSubjects = 10; //static fields (only available on the class itself, not on instances)
+
+    // Constructor method. Can be omitted in a child class if it has no new properties from parent class (same number of properties, and with same name)
+    constructor(fullName, birthYear, startYear, course) {
+        //'super' function: calling the constructor of the parent class
+        // create 'this' keyword in this sub-class, so we must call this function first before we access the 'this' keyword
+        super(fullName, birthYear);
+
+        this.startYear = startYear; //instance property (available on created instance, value can be customized based on input data of the constructor)
+
+        this.#course = course; //private field
+    }
+
+    // Public methods
+    introduce() {
+        console.log(`My name is ${this.fullName} and I study ${this.course}`);
+    }
+
+    study(h) {
+        this.#makeCoffee(); // access private method
+        this.#studyHours += h; // access private field
+    }
+
+    // Private method
+    #makeCoffee() {
+        return 'Here is a coffee for you';
+    }
+
+    // Getter --> get a value out
+    get testScore() {
+        return this.testScore;
+    }
+
+    // Setter --> Set a value
+    set testScore(score) {
+        this.testScore = score <= 20 ? score : 0;
+    }
+
+    // NOTE: If we want to set a property that has the same name with a defined property in the constructor, we should create new property by adding '_' in front of the property name
+    set birthYear(year) {
+        this._birthYear = year;
+    }
+    get birthYear() {
+        return this._birthYear;
+    }
+
+    // Static methods: available only on class. Static methods can only access static properties/methods, cannot access instance properties/methods
+    static printCurriculus() {
+        console.log(`There are ${this.numSubjects} subjects`);
+    }
+}
+const student = new StudentClass3('Jonas', 1990, 2016, 'Medicine');
+console.log(student);
