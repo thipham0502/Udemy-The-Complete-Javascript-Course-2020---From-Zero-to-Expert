@@ -224,8 +224,114 @@ const h1 = document.querySelector('h1');
 const alert_h1 = function(event) {
   alert('addEventListener: You are reading the heading!');
 
-  h1.removeEventListener('mouseenter', alert_h1);
+  h1.removeEventListener('mouseenter', alert_h1); //remove event
 };
 h1.addEventListener('mouseenter', alert_h1);
-///
-setTimeout();
+
+/// Remove the event after 3 seconds
+setTimeout(() => h1.removeEventListener('mouseenter', alert_h1), 3000);
+
+/// Method 3: Add directly on the HTML element (see index13.html, line 37). But not encouraged
+
+/* Lec185. Event Propagation: Bubbling and Capturing */
+console.log('----------Lec185----------');
+// When activate an event of the child element --> also activate the event of the parent element
+
+// Ex:
+// <div class="parent">
+//   <div class="child">
+//     abc
+//   </div>
+// </div>
+// "parent" has 'click' event that changes the background color
+// "child" has 'click' event that changes the text color
+
+// --> When we click "child" --> "child"'s text color is changed AND "parent"'s background color is also changed (the event originates from the child element, and then bubbles up to its parent element --> Propagation)
+// --> When we click "parent" --> only "parent"'s background color is also changed
+
+/* Lec186. Event Propagation in Practice */
+/*
+console.log('----------Lec186----------');
+const randomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
+const randomColor = () =>
+  `rgb(${randomInt(0, 255)},${randomInt(0, 255)},${randomInt(0, 255)})`;
+console.log(randomColor());
+
+document.querySelector('.nav__link').addEventListener('click', function(e) {
+  this.style.backgroundColor = randomColor();
+  console.log('LINK', e.target, e.currentTarget);
+  console.log(e.currentTarget === this); //true
+  // e.target: where the event first happened
+  // e.currentTarget: the element attaching the event (the current element)
+
+  // *Stop the propagation*
+  // e.stopPropagation(); //clicking this child element will not affect nor activate parent elements
+});
+
+document.querySelector('.nav__links').addEventListener('click', function(e) {
+  this.style.backgroundColor = randomColor();
+  this.style.color = randomColor();
+  console.log('CONTAINER', e.target, e.currentTarget);
+  console.log(e.currentTarget === this); //true
+  // e.target: where the event first happened
+  // e.currentTarget: the element attaching the event (the current element)
+});
+
+document.querySelector('.nav').addEventListener('click', function(e) {
+  this.style.backgroundColor = randomColor();
+  console.log('NAV', e.target, e.currentTarget);
+  console.log(e.currentTarget === this); //true
+  // e.target: where the event first happened
+  // e.currentTarget: the element attaching the event (the current element)
+});
+
+// NOTE: e.target is the element we have clicked:
+// Ex: When we click '.nav__link' --> All 3 e.target are '.nav__link';
+/// When we click '.nav__links' --> Show e.target = '.nav__links' for CONTAINER & NAV;
+/// When we click '.nav' --> Show e.target = '.nav' for only NAV;
+
+// NOTE: 1 element is listening to 2 events: the event of itself, and the event bubbling up from its child elements
+*/
+
+/* Lec187. Event Delegation: Implementing Page Navigation */
+console.log('----------Lec187----------');
+// Page navigation
+/*
+document.querySelectorAll('.nav__link').forEach(function(elem) {
+  // Attach the click event for each '.nav__link' element
+  elem.addEventListener('click', function(e) {
+    e.preventDefault(); //prevent default navigation
+    const id = this.getAttribute('href'); //get 'href' attribute
+    console.log(id); //the section id to scroll to
+
+    document.querySelector(id).scrollIntoView({
+      behavior: 'smooth'
+    });
+  });
+  // NOTE: Doing so is not a clean solution because we are creating the same function for every element. What if we have 1000 elements? This will impact the performance
+  // Solution: *Event Delegation*
+});
+*/
+
+// *Event Delegation*
+/// Step 1: Add event listener to the parent element of all the child elements we want to add event
+document.querySelector('.nav__links').addEventListener('click', function(e) {
+  // '.nav__links' is the parent of '.nav__link'
+  // console.log('e.target', e.target);
+  e.preventDefault(); //prevent default navigation
+
+  /// Step 2: Checking if the e.target contains '.nav__link' (i.e. when we click the nav__link)
+  if (e.target.classList.contains('nav__link')) {
+    const id = e.target.getAttribute('href'); //get 'href' attribute
+    console.log(id); //the section id to scroll to
+    // Do the smooth scrolling
+    document.querySelector(id).scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
+});
+
+/* Lec188. DOM Traversing */
+console.log('----------Lec188----------');
+const h1 = document;

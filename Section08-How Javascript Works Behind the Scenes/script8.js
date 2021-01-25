@@ -1,40 +1,46 @@
 'use strict';
 
 /* Lec92. Scope and the Scope Chain */
+// Global scope
+// Function scope (Local scope): variables are accessible only inside the function, NOT outside
+// Block scope: : variables are accessible only inside a block, but only applies to 'let' and 'const'. NOTE: Functions are also block scoped in 'strict' mode
+
 function calcAge(birthYear) {
-	const age = 2020 - birthYear; //function scoped
+    const age = 2020 - birthYear; //function scoped
 
-	console.log(firstName); //accessible
-	//dont use 'name' for variable because 'name' is a special word in Js
+    console.log(firstName); //accessible (='Kathy') (global variable)
+    //dont use 'name' for variable because 'name' is a special word in Js
 
-	function printAge() {
-		const output = `${firstName}, you are ${age}, born in ${birthYear}`; //firstName accessible from the global scope; age, birthYear accessible from the parent function
-		console.log(output);
+    // const printAge = function() {
+    function printAge() {
+        const output = `${firstName}, you are ${age}, born in ${birthYear}`; //firstName accessible from the global scope; age, birthYear accessible from the parent function
+        console.log(output);
 
-		if (age >= 18) {
-			var adult = true;
+        if (age >= 18) {
+            var adult = true;
 
-			const firstName = 'Thi';
-			const str = `Oh, and you're an adult, ${firstName}`; //Thi, not Kathy, because it takes value at the current scope
-			console.log(str);
+            const firstName = 'Thi'; //over-write
+            const str = `Oh, and you're an adult, ${firstName}`; //Thi, not Kathy, because it takes value at the current scope
+            console.log(str);
 
-			//If 'use strict' mode, then functions can also be block scoped (function inside a block cannot be accessed outside of the block)
-			function add(a, b) {
-				return a + b;
-			}
+            //If 'use strict' mode, then functions can also be block scoped (function inside a block cannot be accessed outside of the block)
+            function add(a, b) {
+                return a + b;
+            }
 
-			console.log(add(2, 3)); //accessible, function 'add' is block scoped
-		}
-		// console.log(str); //inaccesible, 'str' is block scoped
+            console.log(add(2, 3)); //accessible, function 'add' is block scoped
+        }
+        // console.log(str); //inaccesible, 'str' is block scoped
 
-		console.log(adult); //accessible, declared with 'var' -> ignore block scope (but still affected by function scope)
+        console.log(adult); //accessible, declared with 'var' -> ignore block scope (but still affected by function scope)
 
-		// add(2, 3); //inaccessible, function 'add' is block scoped (and we're using 'strict' mode)
-	}
-	printAge();
-	// console.log(adult); //inaccessible, 'adult' is function scoped
+        // add(2, 3); //inaccessible, function 'add' is block scoped (and we're using 'strict' mode)
+    }
+    printAge();
+    // console.log(adult); //inaccessible, 'adult' is function scoped
 
-	return age;
+    // console.log(adult); //inaccessible, declared with 'var' -> ignore block scope (but still affected by function scope)
+    return age;
 }
 
 const firstName = 'Kathy'; //global scoped
@@ -58,7 +64,7 @@ const year = 1998;
 console.log(addDeclaration(2, 3)); //accessible -> We can call the function declaration before it is defined
 
 /*
-console.log(addExpression_const(2, 3)); //inaccessible (ReferenceError: Cannot access 'addExpression_const' before initialization) -> We are calling 'addExpression' is in its Temporal Dead Zone (cannot call the before it is defined)
+console.log(addExpression_const(2, 3)); //inaccessible (ReferenceError: Cannot access 'addExpression_const' before initialization) -> We are calling 'addExpression_const' is in its Temporal Dead Zone (cannot call the before it is defined)
 
 console.log(addArrow_const(2, 3)); //inaccessible (ReferenceError: Cannot access 'addArrow_const' before initialization) -> We are calling 'addArrow' is in its Temporal Dead Zone (cannot call the before it is defined)
 
@@ -68,17 +74,17 @@ console.log(addArrow_var(2, 3)); //inaccessible (TypeError: 'addArrow_var' is no
 */
 // Declaration style
 function addDeclaration(a, b) {
-	return a + b;
+    return a + b;
 }
 
 // Expression style with const
 const addExpression_const = function(a, b) {
-	return a + b;
+    return a + b;
 };
 
 // Expression style with var
 var addExpression_var = function(a, b) {
-	return a + b;
+    return a + b;
 };
 
 // Arrow style with const
@@ -109,33 +115,40 @@ console.log(this); //'this' in the global scope is the global window object
 
 // Regular function call in 'strict' mode: 'this' === undefined
 const calcAge_Regular = function(birthYear) {
-	console.log(2020 - birthYear);
-	console.log(this); //'this' === undefined
+    console.log(2020 - birthYear);
+    console.log(this); //'this' === undefined
 };
-calcAge_Regular(1998); //undefined
+calcAge_Regular(1998); //22 undefined
+
+function a(birthYear) {
+    console.log(2020 - birthYear);
+    console.log(this); //'this' === undefined
+}
+console.log('a');
+a(1998); //22 undefined
 
 // Arrow function: 'this' get the 'this' of the parent's function -> 'this' in the global scope -> the global window object
-const calcAge_Arrow = (birthYear) => {
-	console.log(2020 - birthYear);
-	console.log(this); //'this' === window object
+const calcAge_Arrow = birthYear => {
+    console.log(2020 - birthYear);
+    console.log(this); //'this' === window object
 };
 calcAge_Arrow(1998); //undefined
 
 // Function is a method of an object -> 'this' === the object calling it
 const kathy = {
-	myName: 'Kathy',
-	year: 1998,
-	calcAge_Object: function() {
-		console.log(this); //'this' === the object calling it
-		console.log(`${this.myName} is ${2020 - this.year} years old.`);
-	}
+    myName: 'Kathy',
+    year: 1998,
+    calcAge_Object: function() {
+        console.log(this); //'this' === the object calling it
+        console.log(`${this.myName} is ${2020 - this.year} years old.`);
+    },
 };
 kathy.calcAge_Object(); //'Kathy is 22 years old.'
 
 // Copy method of object A to object B
 const sean = {
-	myName: 'Sean',
-	year: 1991
+    myName: 'Sean',
+    year: 1991,
 };
 sean.calcAge = kathy.calcAge_Object; //copy
 sean.calcAge(); //'Sean is 29 years old.'
@@ -145,41 +158,53 @@ const func = kathy.calcAge_Object;
 
 /* Lec98. Regular Functions vs. Arrow Functions */
 const john = {
-	lastName: 'Michael',
-	year: 1997,
-	calcAge1: function() {
-		//console.log(this); //'this' === the object calling it
-		console.log(`${this.lastName} is ${2020 - this.year} years old.`);
+    lastName: 'Michael',
+    year: 1997,
+    calcAge1: function() {
+        //console.log(this); //'this' === the object calling it
+        console.log(`${this.lastName} is ${2020 - this.year} years old.`);
 
-		// Regular function inside method: 'this' still === undefined
-		const isAdult = function() {
-			console.log(this); //undefined
-			console.log(2020 - this.year >= 18 ? `${this.lastName} is an adult` : `${this.lastName} is not an adult`); //cannot access 'this.year', 'this.lastName'
-		};
-		isAdult(); //Regular function call (no object is calling it -> this === undefined)
-	},
-	calcAge2: function() {
-		const self = this; //self (that) = this = object 'john' (save/preserve the 'this' value so that we can use it in the regular function 'isAdult')
+        // Regular function inside method: 'this' still === undefined
+        const isAdult = function() {
+            console.log(this); //undefined
+            console.log(
+                2020 - this.year >= 18
+                    ? `${this.lastName} is an adult`
+                    : `${this.lastName} is not an adult`
+            ); //cannot access 'this.year', 'this.lastName'
+        };
+        isAdult(); //Regular function call (no object is calling it -> this === undefined)
+    },
+    calcAge2: function() {
+        const self = this; //self (that) = this = object 'john' (save/preserve the 'this' value so that we can use it in the regular function 'isAdult')
 
-		// Regular function inside method: 'this' still === undefined
-		const isAdult = function() {
-			//console.log(this); //undefined
-			console.log(self); //object 'john'
-			console.log(2020 - self.year >= 18 ? `${self.lastName} is an adult` : `${self.lastName} is not an adult`); //'self.year' = 1997, 'self.lastName' = 'Michael'
-		};
-		isAdult(); //No error
-	},
-	calcAge3: function() {
-		// Arrow function inside method: 'this' from the parent scope === 'john' object
-		const isAdult = () => {
-			console.log(this); //'john' object
-			console.log(2020 - this.year >= 18 ? `${this.lastName} is an adult` : `${this.lastName} is not an adult`); //'this.year' = 1997, 'this.lastName' = 'Michael'
-		};
-		isAdult(); //No error
-	},
+        // Regular function inside method: 'this' still === undefined
+        const isAdult = function() {
+            //console.log(this); //undefined
+            console.log(self); //object 'john'
+            console.log(
+                2020 - self.year >= 18
+                    ? `${self.lastName} is an adult`
+                    : `${self.lastName} is not an adult`
+            ); //'self.year' = 1997, 'self.lastName' = 'Michael'
+        };
+        isAdult(); //No error
+    },
+    calcAge3: function() {
+        // Arrow function inside method: 'this' from the parent scope === 'john' object
+        const isAdult = () => {
+            console.log(this); //'john' object
+            console.log(
+                2020 - this.year >= 18
+                    ? `${this.lastName} is an adult`
+                    : `${this.lastName} is not an adult`
+            ); //'this.year' = 1997, 'this.lastName' = 'Michael'
+        };
+        isAdult(); //No error
+    },
 
-	//Arrow function: 'this' get the 'this' of the parent's function -> 'this' is the global window object -> window object has no variable lastName -> undefined (NOTE: Object is not a scope)
-	greet: () => console.log(`Hey ${this.lastName}!`) //this.lastName === undefined
+    //Arrow function: 'this' get the 'this' of the parent's function -> 'this' is the global window object -> window object has no variable lastName -> undefined (NOTE: Object is not a scope)
+    greet: () => console.log(`Hey ${this.lastName}!`), //this.lastName === undefined
 };
 john.greet(); //'Hey undefined!'
 console.log(this.lastName); //window.lastName === undefined
@@ -196,15 +221,15 @@ john.calcAge2(); //No error
 /* 'arguments' keyword */
 // Using 'arguments' keyword in regular function
 function addDeclaration2(a, b) {
-	console.log(arguments);
-	return a + b;
+    console.log(arguments);
+    return a + b;
 }
 addDeclaration2(1, 2); //[1, 2]
 
 // Using 'arguments' keyword in expression function
 var addExpression = function(a, b) {
-	console.log(arguments);
-	return a + b;
+    console.log(arguments);
+    return a + b;
 };
 addExpression(2, 3); //[2, 3]
 addExpression(2, 3, 4, 5); //[2, 3, 4, 5] (even though the function only has 2 parameters)
@@ -212,8 +237,8 @@ addExpression(2, 3, 4, 5); //[2, 3, 4, 5] (even though the function only has 2 p
 
 // Using 'arguments' keyword in arrow function -> Error!
 var addArrow = (a, b) => {
-	console.log(arguments);
-	return a + b;
+    console.log(arguments);
+    return a + b;
 };
 //addArrow(2, 3); //ReferenceError: arguments is not defined
 
@@ -230,8 +255,8 @@ console.log(age);
 console.log(oldAge);
 
 const myself = {
-	name: 'Kathy',
-	age: 22
+    name: 'Kathy',
+    age: 22,
 };
 const myfriend = myself; //address of 'myself' = address of 'myfriend' (2 variables but point to only 1 object ~ 1 address in the memory heap)
 myfriend.name = 'John'; //also change 'name' of 'myself'
@@ -245,9 +270,9 @@ console.log(myselfCopy1); //name = 'Mary'
 
 // NOTE: Object.assign is just a shallow copy ie. just copying properties in the first level, cannot copy its child/nested reference values (still point to the same memory address)
 const myself2 = {
-	name: 'Kathy',
-	age: 22,
-	family: [ 'Alice', 'Bob' ] //array is an reference value
+    name: 'Kathy',
+    age: 22,
+    family: ['Alice', 'Bob'], //array is an reference value
 };
 const myselfCopy2 = Object.assign({}, myself2);
 
