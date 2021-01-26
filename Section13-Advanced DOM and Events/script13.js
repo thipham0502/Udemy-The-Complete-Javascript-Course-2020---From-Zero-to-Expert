@@ -432,7 +432,7 @@ tabsContainer.addEventListener('click', function(e) {
   // *Activate tab content: When button 1 is clicked, tab content 1 becomes active, and all other tabs are inactive
   /// According to the button's 'data-tab' attribute to get the id number of the corresponding tab content
   /// 'data-tab' is a data attribute, which always starts with the word 'data', and then follows with '-<name>'. To access it, we use .dataset.<name>
-  console.log(clicked.dataset.tab); //tab is the name of the data attribute
+  console.log(clicked.dataset.tab); //'tab' is the name of the data attribute
   /// First, we remove active class from all tabs
   tabsContent.forEach(tab =>
     tab.classList.remove('operations__content--active')
