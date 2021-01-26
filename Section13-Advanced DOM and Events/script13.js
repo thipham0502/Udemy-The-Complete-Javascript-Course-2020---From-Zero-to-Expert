@@ -268,7 +268,7 @@ console.log('----------Lec185----------');
 // "child" has 'click' event that changes the text color
 
 // --> When we click "child" --> "child"'s text color is changed AND "parent"'s background color is also changed (the event originates from the child element, and then bubbles up to its parent element --> Propagation)
-// --> When we click "parent" --> only "parent"'s background color is also changed
+// --> When we click "parent" --> only "parent"'s background color is changed
 
 /* Lec186. Event Propagation in Practice */
 /*
@@ -346,10 +346,13 @@ document.querySelector('.nav__links').addEventListener('click', function(e) {
   if (e.target.classList.contains('nav__link')) {
     const id = e.target.getAttribute('href'); //get 'href' attribute
     console.log(id); //the section id to scroll to
+
     // Do the smooth scrolling
-    document.querySelector(id).scrollIntoView({
-      behavior: 'smooth'
-    });
+    /// The 'Open account' has href="#" --> ignores it
+    if (id !== '#')
+      document.querySelector(id).scrollIntoView({
+        behavior: 'smooth'
+      });
   }
 });
 
@@ -441,4 +444,71 @@ tabsContainer.addEventListener('click', function(e) {
   document
     .querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add('operations__content--active');
+});
+
+/* Lec190. Passing Arguments to Event Handlers */
+console.log('----------Lec190----------');
+// Make a menu fade animation: when we hover over a link, all other links will fade out
+// (Work with all elements inside <nav class="nav"></nav>)
+const nav = document.querySelector('.nav');
+
+// Add hover events
+/// Hover in: fade other links when we hover a link
+/// NOTE: 'mouseover' is similar to 'mouseenter', but 'mouseenter' does not bubble up (see Lec185). We need to bubble up so that we can reach the parent's element
+// nav.addEventListener('mouseover', function(e) {
+//   // Check if we really click the nav__link
+//   if (e.target.classList.contains('nav__link')) {
+//     const link = e.target; //the clicked link
+//     // Select all its sibling links: traverse to its parent --> select all children of the parent
+//     /// nav --> nav__links --> nav__item --> nav_link
+//     const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+//     // Reduce opacity to make fade animation for other links
+//     siblings.forEach(elem => {
+//       // Just change other links, not include the current link
+//       if (elem !== link) elem.style.opacity = 0.5;
+//     });
+//   }
+// });
+
+/// Hover out: turns everything back to normal
+/// NOTE: Opposite of 'mouseenter' is 'mouseleave'. Opposite of 'mouseover' is 'mouseout'
+// nav.addEventListener('mouseout', function(e) {
+//   // Check if we really click the nav__link
+//   if (e.target.classList.contains('nav__link')) {
+//     const link = e.target; //the clicked link
+//     // Select all its sibling links: traverse to its parent --> select all children of the parent
+//     /// nav --> nav__links --> nav__item --> nav_link
+//     const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+//     // Increase opacity to normal
+//     siblings.forEach(elem => {
+//       // Just change other links, not include the current link
+//       if (elem !== link) elem.style.opacity = 1;
+//     });
+//   }
+// });
+
+// Function for hover event (prevent duplicating codes)
+const handleHover = function(e, opacity) {
+  //Check if we really click the nav__link
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target; //the clicked link
+
+    // Select all its sibling links: traverse to its parent --> select all children of the parent
+    /// nav --> nav__links --> nav__item --> nav_link
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+
+    // Reduce opacity to make fade animation for other links
+    siblings.forEach(elem => {
+      // Just change other links, not include the current link
+      if (elem !== link) elem.style.opacity = opacity;
+    });
+  }
+};
+
+// Call handleHover() inside the event's callback function, parsing the event 'e' parameters
+nav.addEventListener('mouseover', function(e) {
+  handleHover(e, 0.5);
+});
+nav.addEventListener('mouseout', function(e) {
+  handleHover(e, 1);
 });
