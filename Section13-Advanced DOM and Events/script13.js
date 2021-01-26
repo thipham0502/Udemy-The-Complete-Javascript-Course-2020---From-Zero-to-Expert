@@ -34,6 +34,27 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+/* Lec180. How the DOM Really Works */
+console.log('----------Lec180----------');
+// DOM tree is generated from an HTML document. DOM contains lots of methods and properties to interact with DOM tree
+// Every single node in the DOM tree is type 'Node', each node is represented in Js by an object and can get access to special methods & properties such as: .textContent, .childNodes, .parentNode, .cloneNode(), etc.
+// 'Node''s parent node is 'EventTarget', provides methods: .addEventListener(), .removeEventListener()
+// 'EventTarget' has another child: 'Window' - a global object, lots of methods and properties, maybe unrelated to DOM
+// 'Node' has some child types: 'Element', 'Text', 'Comment', 'Document' (everything in the HTML has to go into DOM)
+//// *Text: text inside an element gets its own node, which is type 'Text'
+//// (Ex: <p>My paragraph</p> => Text: "My paragraph")
+//// *Comment: (Ex: <!--My comment--> => Comment: "My comment")
+//// *Document: provides methods: *.querySelector()*, createElement(), .getElementById(), etc.
+//// *Element: the element itself (Ex: <p>My paragraph</p> => Element: <p></p>)
+////// => Properties: .innerHTML, .classList, .children, .parentElement, etc.
+////// => Methods: .append(), .remove(), .insertAdjacentHTML(), *.querySelector()*, .closest(), .matches(), .scrollIntoView(), .setAttribute(), etc.
+////// 'Element' has some child types: Element -> HTMLElement -> HTMLButtonElement (for buttons)
+//////                                                        -> HTMLDivElement (for divs)
+//////                                                        -> ... (for links, images, etc)
+////// (Each HTML element has it own type which is a child type of type 'HTMLElement'. For example, buttons has type 'HTMLButtonElement', ... Each type has some different unique properties, ex: image has 'src' attribute)
+// NOTE: Child objects can inherit from it parent's properties and methods (ex: 'HTMLElement' can have access to .innerHTML of 'Element', .cloneNode() of 'Node', and .addEventListener() of 'EventTarget'. Because 'EventTarget' (.addEventListener()) has child 'Node' (.cloneNode()) has child 'Element' (.innerHTML) has child 'HTMLElement')
+// **See photo "How-DOM-API-is-Organized-Behind-the-Scene.png"**
+
 /* Lec181. Selecting, Creating, and Deleting Elements */
 console.log('----------Lec181----------');
 // *Select
@@ -207,7 +228,7 @@ console.log('----------Lec184----------');
 // See more: https://developer.mozilla.org/en-US/docs/Web/Events
 
 // *Add event
-const h1 = document.querySelector('h1');
+let h1 = document.querySelector('h1');
 /// Method 1
 // mouseenter: when hover the mouse over an element
 // h1.addEventListener('mouseenter', function(event) {
@@ -334,4 +355,90 @@ document.querySelector('.nav__links').addEventListener('click', function(e) {
 
 /* Lec188. DOM Traversing */
 console.log('----------Lec188----------');
-const h1 = document;
+h1 = document.querySelector('h1');
+
+// *Going downwards: parent to child
+console.log(h1.querySelectorAll('.highlight')); //select all child elements of h1 with 'highlight' class
+/// NOTE: querySelector()/querySelectorAll() can allow to go deeper (Ex: child of child of child...), not just select the direct child
+
+console.log(h1.childNodes); //get all direct children (text, comment and child HTML elements)
+console.log(h1.children); //get all direct HTML element children (return a HTMLCollection)
+
+console.log(h1.firstElementChild); //get the first child HTML element
+// h1.firstElementChild.style.color = 'white';
+console.log(h1.firstChild); //get the first child (can be text, comment, and doesnt have to be a HTML element) (not often used)
+
+console.log(h1.lastElementChild); //get the last child element
+// h1.lastElementChild.style.color = 'orangered';
+console.log(h1.lastChild); //get the last child (can be text, comment, and doesnt have to be a HTML element) (not often used)
+
+// *Going upwards: child to parent
+console.log(h1.parentNode); //get direct parent
+console.log(h1.parentElement); //get direct parent
+
+console.log(h1.closest('.header')); //select the closest parent of h1 with class="header"
+// h1.closest('.header').style.background = 'var(--gradient-secondary)'; //(see ':root' element in style13.css)
+
+console.log(h1.closest('h1')); //select the closest parent of h1 that is h1 itself
+
+// NOTE:        h1.querySelector()              <>                  h1.closest()
+//    Finds children (no matter how deep)             Finds parents (no matter how far up)
+
+// *Going sideways: siblings (same parent, same level)
+console.log(h1.previousElementSibling); //get the previous siblings (=null in this case)
+console.log(h1.nextElementSibling); //get the next siblings (=<h4>A simpler banking experience for a simpler life.</h4> in this case)
+
+console.log(h1.parentElement.children); //select all siblings of h1, including itself (returns a HTMLCollection)
+
+const siblings = [...h1.parentElement.children]; //HTMLCollection is iterable, so we can turn it into an array using spread operator '...'
+console.log(siblings);
+siblings.forEach(function(elem) {
+  // Compare element & element
+  if (elem !== h1) {
+    // elem.style.transform = 'scale(0.5)'; //set size 50% smaller, except for h1 element
+  }
+});
+
+/* Lec189. Building a Tabbed Component */
+console.log('----------Lec189----------');
+// Each tab has a different content
+
+// Select eLements to work with (in <div class="operations"></div>)
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+// Add event to each element
+// tabs.forEach(tab => tab.addEventListener('click', () => console.log('TAB')));
+// NOTE: This is a bad practive because we are making a copy for the event callback function on each element. If we have 1000 elements --> 1000 copies of 1 function --> Slow performance 👎 (already mentioned in Lec187 --> use *Event Delegation* instead)
+
+tabsContainer.addEventListener('click', function(e) {
+  // const clicked = e.target; //get the element we click on
+  // There is a <span> inside the button, so we use .closest() to get its closest parent with class '.operations__tab'. If it's already the tab we want, then simply return itself
+  const clicked = e.target.closest('.operations__tab'); //get the button
+  console.log(clicked);
+
+  // Because this click event is attach to the whole tab-container, so we should prevent from clicking on other space outside the button
+  // Guard clause: when we don't click on the button, but click on somewhere else in the tab-container, 'clicked' will be null. So when 'clicked' is null, we do nothing and return immediately
+  if (!clicked) return;
+
+  // *Activate button: When button 1 is clicked, it becomes active, and all other buttons are inactive
+  /// First, we remove active class from all tabs
+  tabs.forEach(tab => tab.classList.remove('operations__tab--active'));
+
+  /// Then, we set active class to the right tab
+  clicked.classList.add('operations__tab--active');
+
+  // *Activate tab content: When button 1 is clicked, tab content 1 becomes active, and all other tabs are inactive
+  /// According to the button's 'data-tab' attribute to get the id number of the corresponding tab content
+  /// 'data-tab' is a data attribute, which always starts with the word 'data', and then follows with '-<name>'. To access it, we use .dataset.<name>
+  console.log(clicked.dataset.tab); //tab is the name of the data attribute
+  /// First, we remove active class from all tabs
+  tabsContent.forEach(tab =>
+    tab.classList.remove('operations__content--active')
+  );
+  /// Then, we set active class to the right tab
+  document
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
+});
