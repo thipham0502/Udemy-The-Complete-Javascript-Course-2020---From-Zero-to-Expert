@@ -78,8 +78,8 @@ message.classList.add('cookie-message'); //add class name to the element
 // message.textContent = 'We use cookied for improved functionality and analytics.'; //only text inside element
 message.innerHTML =
   'We use cookied for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>'; //HTML content (including tags)
-// header.prepend(message); //add new element as the 1st child of 'header'
-header.append(message); //add new element as the last child of 'header'
+header.prepend(message); //add new element as the 1st child of 'header'
+// header.append(message); //add new element as the last child of 'header'
 // NOTE: Each element can only be inserted once (because every DOM element iss unique and so cannot appear at multiple places in the document)
 // --> We can use prepend & append to insert and then move the element inside the document
 
@@ -182,7 +182,7 @@ console.log(logo.classList.contains('class1'));
 console.log('----------Lec183----------');
 // Click the button and smoothly scroll to a section
 const btnScrollTo = document.querySelector('.btn--scroll-to');
-const section1 = document.querySelector('#section--1');
+let section1 = document.querySelector('#section--1');
 
 btnScrollTo.addEventListener('click', function(event) {
   // Get the coordinates of the element we are scrolling to
@@ -453,6 +453,7 @@ console.log('----------Lec190----------');
 const nav = document.querySelector('.nav');
 
 // Add hover events
+/// *Method 1:
 /// Hover in: fade other links when we hover a link
 /// NOTE: 'mouseover' is similar to 'mouseenter', but 'mouseenter' does not bubble up (see Lec185). We need to bubble up so that we can reach the parent's element
 // nav.addEventListener('mouseover', function(e) {
@@ -487,8 +488,38 @@ const nav = document.querySelector('.nav');
 //   }
 // });
 
+/// *Method 2:
 // Function for hover event (prevent duplicating codes)
-const handleHover = function(e, opacity) {
+// const handleHover = function(e, opacity) {
+//   //Check if we really click the nav__link
+//   if (e.target.classList.contains('nav__link')) {
+//     const link = e.target; //the clicked link
+
+//     // Select all its sibling links: traverse to its parent --> select all children of the parent
+//     /// nav --> nav__links --> nav__item --> nav_link
+//     const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+
+//     // Reduce opacity to make fade animation for other links
+//     siblings.forEach(elem => {
+//       // Just change other links, not include the current link
+//       if (elem !== link) elem.style.opacity = opacity;
+//     });
+//   }
+// };
+
+// Call handleHover() inside the event's callback function, parsing the event 'e' parameters
+// nav.addEventListener('mouseover', function(e) {
+//   handleHover(e, 0.5);
+// });
+// nav.addEventListener('mouseout', function(e) {
+//   handleHover(e, 1);
+// });
+
+/// *Method 3: Use .bind() to create a copy of the function being called and set the 'this' keyword to a certain
+const handleHover = function(e) {
+  // (no need to pass opacity argument)
+  // console.log(this); //this === opacity value
+
   //Check if we really click the nav__link
   if (e.target.classList.contains('nav__link')) {
     const link = e.target; //the clicked link
@@ -500,15 +531,95 @@ const handleHover = function(e, opacity) {
     // Reduce opacity to make fade animation for other links
     siblings.forEach(elem => {
       // Just change other links, not include the current link
-      if (elem !== link) elem.style.opacity = opacity;
+      if (elem !== link) elem.style.opacity = this; //this === opacity value
     });
   }
 };
+// The parameter passed into .bind() will be the 'this' in function handleHover()
+nav.addEventListener('mouseover', handleHover.bind(0.5)); //pass the opacity value
+nav.addEventListener('mouseout', handleHover.bind(1));
 
-// Call handleHover() inside the event's callback function, parsing the event 'e' parameters
-nav.addEventListener('mouseover', function(e) {
-  handleHover(e, 0.5);
-});
-nav.addEventListener('mouseout', function(e) {
-  handleHover(e, 1);
-});
+// NOTE: If we want to pass multiple arguments, pass as an array or an object (.bind() only take 1 argument)
+/// Ex:
+const handleHover1 = function(e) {
+  // (no need to pass opacity argument)
+  // console.log(this);
+};
+nav.addEventListener('mouseover', handleHover1.bind([0.5, 1, 2]));
+nav.addEventListener(
+  'mouseout',
+  handleHover1.bind({ opacity: 0.5, message: 'mouseout' })
+);
+
+/* Lec191. Implementing a Sticky Navigation: The Scroll Event */
+console.log('----------Lec191----------');
+// Sticky navigation bar is attached to the top of the page when we scroll to a certain position
+// In this case, we want the navigation bar to become sticky as soon as we scroll to section 1
+section1 = document.querySelector('#section--1');
+const initialCoords = section1.getBoundingClientRect(); //get the current coordinates of section 1
+console.log(initialCoords);
+
+// Event whenever we scroll our page
+// window.addEventListener('scroll', function() {
+//   // console.log(window.scrollY); //get y position
+
+//   // Navigation bar becomes sticky as soon as we scroll to section 1
+//   if (window.scrollY > initialCoords.top) {
+//     nav.classList.add('sticky'); //add 'sticky' class when we scroll down to section 1
+//   } else {
+//     nav.classList.remove('sticky'); //remove the sticky navigation when we scroll up over section 1
+//   }
+// });
+// NOTE: However, attaching 'scroll' event to window is not a good practice because it is activated on every tiny change in the scroll, so that makes bad performance (on old phones, .... See Lec192 for a better way
+
+/* Lec192. A Better Way: The Intersection Observer API */
+console.log('----------Lec192----------');
+// Goal: Display the sticky navigation bar whenever the header disappears
+
+// *Create callback function for IntersectionObserver()
+// Arguments:
+/// 'entries': array of threshold (in 'obsOptions')
+/// 'observer': the observer created by new IntersectionObserver() (we dont need this in this case)
+// const obsCallback = function(entries, observer) {
+const obsCallback = function(entries) {
+  // If 'threshold' is an array, we use a loop
+  // entries.forEach(entry => {
+  //   console.log(entry);
+  // });
+
+  // But this case we only have 1 threshold value
+  const entry = entries[0];
+  // console.log(entry);
+
+  // When we scroll down and reach the position where header is 0% visible
+  // ==> Our screen is NOT intersecting with the header (phần header và màn hình hiện tại không giao nhau, không có phần chung) ==> entry.isIntersecting === false
+  if (!entry.isIntersecting) {
+    nav.classList.add('sticky');
+  }
+  // When we scroll up and reach the position where header is greater than 0% visible
+  // ==> Our screen is intersecting with the header (phần header và màn hình hiện tại có giao nhau, nghĩa là trên màn hình đang hiển thị header hoặc 1 phần của header) ==> entry.isIntersecting === true
+  else {
+    nav.classList.remove('sticky');
+  }
+};
+
+const navHeight = nav.getBoundingClientRect().height; //the height of the navigation
+
+// *Create object of options for IntersectionObserver()
+const obsOptions = {
+  root: null, //the element we want to intersect with the header (this case we use the screen so root is null)
+  threshold: 0, //the % of header is visible when the event is activated. Can be an array
+
+  // rootMargin: '-90px' //the height will be added outside the header (we want to show the sticky navigation 90px before the header disappears ie. before the threshold is reached)
+  rootMargin: `-${navHeight}px` //the height will be added outside the header (we want to show the sticky navigation when the top of the page has distance = nav's height before the header disappears ie. before the threshold is reached)
+};
+
+// *Create new Intersection Observer IntersectionObserver(<callback function>, <object of options>)
+const headerObserver = new IntersectionObserver(obsCallback, obsOptions);
+headerObserver.observe(header); //observe the header. Display the sticky navigation bar whenever the header disappears (when header has 0% visible threshold)
+
+// Intersect: Giao cắt
+
+/* Lec193. Revealing Elements on Scroll */
+console.log('----------Lec193----------');
+// Reveal the element as soon as we scroll to close them (see demo at https://bankist-dom.netlify.app/)
